@@ -820,4 +820,5 @@ class fragment_userlocation : Fragment() {
         subDialog.show()
     }
 
+
 }
