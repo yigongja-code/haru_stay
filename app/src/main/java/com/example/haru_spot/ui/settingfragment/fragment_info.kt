@@ -21,7 +21,11 @@ class fragment_info : Fragment() {
             R.layout.fragment_setting_info,
             container,
             false
+
+
         )
+
+
 
         // 설정으로 돌아가기
         val backButton =

@@ -204,9 +204,14 @@ class MainActivity : AppCompatActivity() {
                             .setNegativeButton("아니오", null)
                             .show()
 
+                    } else if (supportFragmentManager.backStackEntryCount > 0) {
+
+                        // 하위 Fragment에서는 이전 Fragment로 돌아감
+                        supportFragmentManager.popBackStack()
+
                     } else {
 
-                        // 다른 Fragment에서는 홈으로 이동
+                        // 최상위 Fragment에서는 홈으로 이동
                         binding.bottomNavigation.selectedItemId = R.id.nav_bar
                     }
                 }
