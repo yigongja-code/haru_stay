@@ -936,8 +936,23 @@ class SumUtil {
 
 
                 // 체류시간
+                // 체류시간
 
-                val endTime =
+                val stayMillis =
+                    spot.spSpotTime
+
+                val safeStayMillis =
+                    if (stayMillis > 0L) {
+                        stayMillis
+                    } else {
+                        0L
+                    }
+
+                stayMinutes +=
+                    safeStayMillis /
+                            (60L * 1000L)
+
+               /* val endTime =
                     spot.spEndTime
                         ?: now
 
@@ -954,7 +969,7 @@ class SumUtil {
 
                 stayMinutes +=
                     safeStayMillis /
-                            (60L * 1000L)
+                            (60L * 1000L)*/
             }
 
 
