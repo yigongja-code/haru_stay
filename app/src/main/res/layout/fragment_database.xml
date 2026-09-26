@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/timeline_bg">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 2️⃣ [중단] DB 로그 데이터 시각화 표 -->
+
+            <TableLayout
+                android:id="@+id/tableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/dialog_holo_light_frame"
+                android:padding="16dp"
+                android:stretchColumns="1"
+                android:layout_marginBottom="12dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <!-- 📌 표 맨 위에 박아버리는 타이틀 행 -->
+                <TableRow
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/tvTableTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_span="2"
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:textColor="#222222"
+                        android:paddingLeft="10dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="" />
+
+                </TableRow>
+
+                <!-- 📡 즉시 수집 버튼 -->
+
+
+                    <Button
+                        android:id="@+id/btnImmediateCollect"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="0dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:text="📡 수동 수집(1분간격)"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="@color/단추색상" />
+
+
+
+                <!-- 2. 정류장 -->
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 위치"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvBusStop"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#0066CC" />
+                </TableRow>
+
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 주소"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvAdmName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#0066CC" />
+                </TableRow>
+
+                <!-- 1. 시작 시간으로 변경 -->
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 시작시간"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvStartTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="- ~ -"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+                </TableRow>
+
+                <!-- 1-2. 종료 시간 -->
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 종료시간"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvEndTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="- ~ -"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+                </TableRow>
+
+                <!-- 8. 가공시간 -->
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 가공시간"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvGeofencing"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+                </TableRow>
+
+                <!-- 4. gps -->
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• GPS"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvLocation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+                </TableRow>
+
+                <!-- 9. 연결된 GPS 오차 -->
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• GPS 오차"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvGpsRange"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+                </TableRow>
+
+                <!-- 9. 정류장과의거리 logBusDistance -->
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• To Base"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvBusDistance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+                </TableRow>
+
+                <!-- 3. 행정동 코드 -->
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 법정동 코드"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvAdmCode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+                </TableRow>
+
+                <!-- 5. 기지국 -->
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 기지국"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvCellTower"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+                </TableRow>
+
+                <!-- 6. 와이파이 -->
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 와이파이"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvWifi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+                </TableRow>
+
+                <!-- 7. 상태 -->
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 상태"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+                </TableRow>
+
+                <!-- 🗺️ 카카오맵 버튼과 데이터 삭제 버튼을 1:1 비율로 나란히 배치 -->
+                <LinearLayout
+                    android:id="@+id/layoutActionButtons"
+                    android:layout_width="0dp"
+                    android:layout_height="35dp"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp"
+                    app:layout_constraintTop_toBottomOf="@+id/tableLayout"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <!-- 🗺️ 위치보기(카카오맵) 버튼 (1:1 비율) -->
+                    <Button
+                        android:id="@+id/btnCopyMapLink"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="지도"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="@color/단추색상"
+                        android:layout_marginEnd="4dp" />
+
+                    <!-- 🗺️ 즐겨찾기 저장) 버튼 (1:1 비율) -->
+                    <Button
+                        android:id="@+id/btnUserLocationSave"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="즐겨찾기"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="@color/단추색상"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginStart="4dp"/>
+
+                    <!-- 🗑️ 데이터 삭제 버튼 (1:1 비율) -->
+                    <Button
+                        android:id="@+id/btnDeleteCurrentLog"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="삭제"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="@color/단추색상"
+                        android:layout_marginStart="4dp" />
+                </LinearLayout>
+
+                <!-- 🧭 이전/다음 내비게이션 바 -->
+                <LinearLayout
+                    android:id="@+id/layoutBottomNav"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:background="@android:drawable/dialog_holo_light_frame"
+                    android:padding="8dp"
+                    android:layout_marginBottom="4dp"
+                    app:layout_constraintTop_toBottomOf="@+id/btnCopyMapLink"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <Button
+                        android:id="@+id/t_button_prev"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="◀ 이전"
+                        android:textColor="#333333" />
+
+                    <Button
+                        android:id="@+id/tvPageInfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🗓️ 날짜 이동"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#777777"
+                        android:background="@android:color/transparent"
+                        android:minHeight="0dp"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginEnd="0dp"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:paddingLeft="18dp"
+                        android:paddingRight="18dp" />
+
+                    <Button
+                        android:id="@+id/t_button_next"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="다음 ▶"
+                        android:textColor="#333333" />
+                </LinearLayout>
+
+            </TableLayout>
+
+            <!-- 3️⃣ [하단] SPOT DB 데이터 시각화 표 -->
+
+            <TableLayout
+                android:id="@+id/tableLayoutSpot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/dialog_holo_light_frame"
+                android:padding="16dp"
+                android:stretchColumns="1"
+                android:layout_marginBottom="12dp">
+
+                <!-- SPOT DB 타이틀 -->
+                <TableRow
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/tvSpotTableTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_span="2"
+                        android:text="홈 화면 데이터"
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:textColor="#222222"
+                        android:paddingLeft="10dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="" />
+
+                </TableRow>
+
+                <!-- 행정동 -->
+                <TableRow android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 주소"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+
+                    <TextView
+                        android:id="@+id/tvSpAdmName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#0066CC" />
+
+                </TableRow>
+
+                <!-- 행정동 코드 -->
+                <TableRow android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 행정동 코드"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+
+                    <TextView
+                        android:id="@+id/tvSpAdmCode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+
+                </TableRow>
+
+                <!-- 시작 시간 -->
+                <TableRow android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 시작시간"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+
+                    <TextView
+                        android:id="@+id/tvSpStartTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+
+                </TableRow>
+
+                <!-- 종료 시간 -->
+                <TableRow android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 종료시간"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+
+                    <TextView
+                        android:id="@+id/tvSpEndTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+
+                </TableRow>
+
+                <!-- 체류 시간 -->
+                <TableRow android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 체류시간"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+
+                    <TextView
+                        android:id="@+id/tvSpSpotTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+
+                </TableRow>
+
+                <!-- 연결된 메모 ID -->
+                <TableRow android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 메모 ID"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+
+                    <TextView
+                        android:id="@+id/tvSpMemoId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+
+                </TableRow>
+
+                <!-- SPOT 이전/다음 내비게이션 -->
+                <LinearLayout
+                    android:id="@+id/layoutSpotBottomNav"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:background="@android:drawable/dialog_holo_light_frame"
+                    android:padding="8dp"
+                    android:layout_marginBottom="4dp">
+
+                    <Button
+                        android:id="@+id/t_sp_button_prev"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="◀ 이전"
+                        android:textColor="#333333" />
+
+                    <Button
+                        android:id="@+id/tvSpPageInfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🗓️ 날짜 이동"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#777777"
+                        android:background="@android:color/transparent"
+                        android:minHeight="0dp"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:paddingLeft="18dp"
+                        android:paddingRight="18dp" />
+
+                    <Button
+                        android:id="@+id/t_sp_button_next"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="다음 ▶"
+                        android:textColor="#333333" />
+
+                </LinearLayout>
+
+            </TableLayout>
+
+
+
+            <!-- 💡 관리자 테스트 버튼 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="4dp">
+
+                <Button
+                    android:id="@+id/btnApplyCleanBusData"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="✨ 버스 정류장 데이터 재로딩"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="@color/단추색상"
+                    android:layout_marginBottom="4dp" />
+
+                <!-- 가상 데이터 생성 테스트 단추 -->
+                <Button
+                    android:id="@+id/btnGenerateMockData"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🧪 가상 데이터 생성 테스트"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="@color/단추색상"
+                    android:layout_marginBottom="4dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

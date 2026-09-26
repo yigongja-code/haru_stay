@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_bar"
+        android:icon="@drawable/rounded_home_24"
+        android:title="홈" />
+    <item
+        android:id="@+id/nav_test"
+        android:icon="@drawable/outline_footprint_24"
+        android:title="이동경로" />
+    <item
+         android:id="@+id/nav_stats"
+         android:icon="@drawable/ic_stats"
+         android:title="순위" />
+     <!-- 4. 🆕 데이터 관리 (통계 뒤로 쏙!) -->
+    <item
+        android:id="@+id/nav_data_manage"
+        android:icon="@drawable/ic_db"
+        android:title="데이터관리" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_setting"
+        android:title="설정" />
+
+</menu>

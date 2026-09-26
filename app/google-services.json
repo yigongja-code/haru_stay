@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1097648839930",
+    "project_id": "haru-stay",
+    "storage_bucket": "haru-stay.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1097648839930:android:7ebe560d3f49161b0d7d43",
+        "android_client_info": {
+          "package_name": "com.example.haru_spot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKK6fs5g2N9oR_V3aH2kjwNhDH-1Xm7S8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,44 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Haru_Spot" parent="Theme.Material3.Light.NoActionBar">
+        <!-- <style name="Theme.Haru_Spot" parent="Theme.Material3.DayNight.NoActionBar">-->
+        <!-- 기존 스타일 설정들 -->
+        <item name="colorPrimary">@color/timeline_card_bg</item>
+        <item name="colorPrimaryVariant">@color/timeline_card_bg</item>
+        <item name="colorOnPrimary">@color/gray_dark</item>
+
+        <!-- ✨ 상단 상태바 색상 -->
+        <item name="android:statusBarColor">@color/gray_dark</item>
+
+        <!-- ✨ 하단 네비게이션바 색상 -->
+        <item name="android:navigationBarColor">@color/gray_dark</item>
+        <!-- 💡 [핵심] 다이얼로그 안의 글자들은 회색이 아니라 확실하게 보이는 검은색/진한 글씨로 강제 지정! 주석처리하고 테마로 관리 -->
+        <!--<item name="android:textColorAlertDialogListItem">@android:color/black</item>-->
+        <!--<item name="android:textColorPrimary">@android:color/black</item>-->
+</style>
+
+<!-- 💬 다이얼로그 글자 깨짐 방지용 주간 모드 전용 다이얼로그 스타일 -->
+    <style name="CustomAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!-- 다이얼로그 안의 타이틀 및 메시지 텍스트 색상을 확실한 검은색 계열로 고정 -->
+        <item name="android:textColorPrimary">@color/gray_dark</item>
+        <item name="android:textColorAlertDialogListItem">@color/gray_dark</item>
+    </style>
+
+    <!-- 하단 내비게이션바 전용 커스텀 테마
+    <style name="CustomBottomNavTheme" parent="Widget.Material3.BottomNavigationView">
+         선택된 탭의 아이콘/글자 색상을 우리가 원하는 진한 회색으로 고정
+        <item name="colorPrimary">@color/gray_dark</item>
+         선택된 탭 뒤에 생기는 동그란 배경(Active Indicator) 색상도 배경과 맞추거나 투명하게 처리
+        <item name="colorSecondaryContainer">@color/timeline_bg</item>
+    </style> -->
+    <style name="CustomBottomNavTheme" parent="Widget.Material3.BottomNavigationView">
+
+        <item name="colorPrimary">@color/gray_dark</item>
+
+        <!-- 선택된 탭 배경 -->
+        <item name="colorSecondaryContainer">#DDEBFF</item>
+
+        <!-- 선택된 탭의 아이콘/글자 -->
+        <item name="colorOnSecondaryContainer">@color/gray_dark</item>
+
+    </style>
+</resources>

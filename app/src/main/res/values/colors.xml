@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- 📌 미나가 반하고 내가 찜한 그 100점짜리 메인 테마 컬러 -->
+    <color name="timeline_bg">#FAFAFA</color>        <!-- 타임라인 배경색 -->
+    <color name="timeline_card_bg">#F0F4F8</color>   <!-- 로그 박스 배경색 -->
+    <color name="gray_light">#D0D5DD</color>         <!-- 눈금선 색상 -->
+    <color name="gray_dark">#475467</color>          <!-- 시간 텍스트 색상 -->
+
+    <!-- 필요하다면 브랜드 메인 컬러로도 등록! -->
+    <color name="main_theme_color">#F0F4F8</color>
+    <!-- ✨ 새로 추가할 박스 외곽선 컬러 (배경보다 한 단계 진한 감성) -->
+    <color name="timeline_card_stroke">#CBD5E1</color>
+    <color name="nav_item_tint">#475467</color> <!-- 평소엔 진한 회색, 선택되면 테마 기본 accent 색상 적용됨 -->
+    <!-- ✨ [추가] 1.5배 커진 로딩바 전용 푸른빛 세련된 테마 컬러 -->
+    <color name="loading_indicator_color">#1976D2</color>      <!-- 진블루 선 색상 -->
+    <color name="loading_indicator_track">#BBDEFB</color>      <!-- 연한 하늘색 배경 트랙 -->
+    <!-- ✨ 미나가 반하고 내가 찜한 그 100점짜리 뮤트 블루 테마 컬러 -->
+
+    <!-- ✨ 채도가 탁하지 않고 싼티 안 나는 감성 블루 컬러 팔레트 -->
+    <color name="mute_blue_main">#4A6B82</color>     <!-- 고양이 케이스의 차분한 뮤트 블루 -->
+    <color name="deep_navy">#1F2D3D</color>          <!-- 깊이감을 더해주는 딥 네이비 포인트 -->
+    E8F1FDd
+    <!--
+        기본색상..
+      E8F1FDd
+     F1F5F9원래 백판
+     <color name="삭제단추색상">#D9534F</color>
+
+     -->
+    <!-- ✨ 테마 시작 -->
+    <!-- ✨ 테마 시작 -->
+    <!-- 📌 홈 화면 및 전체 빽판 배경 전용 컬러 #D9E2EC-->
+
+    <color name="background1">#F1F5F9</color>
+
+    <color name="card1">#F0FAFF</color>
+
+    <!-- <color name="card1">#D9E2EC</color>-->
+    <color name="검색된카드배경1">#FFF3E0</color>
+
+
+    <color name="단추색상">#4A88BF</color>
+    <color name="삭제단추색상">#FFF3E0</color>
+    <color name="박스라인">#2196F3</color>
+    <color name="리스트배경1">#F8FBFF</color>
+    <color name="선택강조">#FFF3E0</color> <!-- 연한 살구색 -->
+    <!--<color name="선택강조">#FFF3E0</color>  연한 살구색
+    @color/단추색상
+    -->
+
+
+
+</resources>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="6dp"
+    app:cardBackgroundColor="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <!-- 시간 영역 20%
+             오른쪽 두 줄 전체 높이를 사용한다. -->
+        <TextView
+            android:id="@+id/tv_path_time"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:gravity="center_vertical|start"
+            android:textSize="14sp" />
+
+        <!-- 내용 영역 80%
+             이동경로이므로 정류장을 위에 표시한다. -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"
+            android:orientation="vertical">
+
+            <!-- 버스정류장 -->
+            <TextView
+                android:id="@+id/tv_path_bus_stop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:textSize="14sp" />
+
+            <!-- 주소 -->
+            <TextView
+                android:id="@+id/tv_path_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

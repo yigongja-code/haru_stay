@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.HomeFragment">
+
+    <!-- 📌 화면 전체를 통째로 지배하는 일체형 줌인/줌아웃 타임라인 뷰 -->
+    <com.example.haru_spot.ui.view.HomeTimeAxisView
+        android:id="@+id/homeTimeAxisView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/background1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/layoutBottomBar" />
+
+    <!-- 📌 미래 날짜일 때 타임라인 대신 띄울 감성 이미지 뷰 -->
+    <ImageView
+        android:id="@+id/imgFuturePlaceholder"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/loading"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/layoutBottomBar" />
+
+    <!-- 2. 📌 확대·축소에 영향받지 않는 독립적인 하단 컨트롤 바 -->
+    <LinearLayout
+        android:id="@+id/layoutBottomBar"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:background="@color/background1"
+        android:elevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 왼쪽: 전날 이동 버튼 -->
+        <TextView
+            android:id="@+id/btnPrevDay"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="◀"
+            android:textSize="18sp"
+            android:textColor="#222222"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- 중앙: 날짜 표시 텍스트 -->
+        <TextView
+            android:id="@+id/tvCurrentDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="2026-06-07"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#222222"
+            android:background="?attr/selectableItemBackground"
+            android:padding="8dp" />
+
+        <!-- 오른쪽: 다음날 이동 버튼 -->
+        <TextView
+            android:id="@+id/btnNextDay"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="▶"
+            android:textSize="18sp"
+            android:textColor="#222222"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/viewBottomSpacer"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:background="@color/background1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 3. 📌 2층 팝업용 반투명 암막 배경 -->
+    <View
+        android:id="@+id/viewDimBackground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#80000000"
+        android:visibility="gone"
+        android:alpha="0.0"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 4. 📌 2층 상세 정보 팝업 카드 레이아웃 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/layoutDetailPopup"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        android:alpha="0.0"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="12dp"
+        app:cardBackgroundColor="@android:color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintHeight_percent="0.8">
+
+        <!-- 💡 1단계: 가로 스크롤로 전체를 감쌈 -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="horizontal"
+            android:overScrollMode="always">
+
+            <!-- 💡 2단계: 세로 스크롤로 한번 더 감쌈 -->
+            <ScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                android:fillViewport="true">
+
+                <!-- 📌 팝업 내부 수직 레이아웃 (전체 내용 품기) -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="24dp"
+                    android:minWidth="300dp">
+
+                    <!-- 1. 장소 이름 (타이틀) -->
+                    <TextView
+                        android:id="@+id/tvPopupTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="장소 이름"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#222222"
+                        android:layout_marginBottom="1dp" />
+
+                    <!-- 2. 진행 시간 범위 -->
+                    <TextView
+                        android:id="@+id/tvPopupTimeRange"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="시간: "
+                        android:textSize="13sp"
+                        android:textColor="#555555"
+                        android:layout_marginBottom="1dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <!-- 3. 체류 시간 -->
+                    <TextView
+                        android:id="@+id/tvPopupStayDuration"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="체류 시간: "
+                        android:textSize="13sp"
+                        android:textColor="#555555"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginTop="0dp"/>
+
+                    <!-- 4. 정류장 및 위치 좌표 (이제 가로 스크롤에 갇히지 않고 세로 리스트로 예쁘게 출력됨) -->
+                    <TextView
+                        android:id="@+id/tvPopupBusInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="정류장/위치: "
+                        android:textSize="16sp"
+                        android:textColor="#555555"
+                        android:layout_marginBottom="8dp"
+                        android:ellipsize="none"
+                        android:scrollbars="none" />
+
+                    <!-- 5. 네트워크 및 와이파이 정보 -->
+                    <TextView
+                        android:id="@+id/tvPopupNetworkInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="네트워크: "
+                        android:textSize="16sp"
+                        android:textColor="#555555"
+                        android:layout_marginBottom="8dp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:scrollbars="none"/>
+
+                    <!-- 6. 상태 -->
+                    <TextView
+                        android:id="@+id/tvPopupStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="상태: "
+                        android:textSize="16sp"
+                        android:textColor="#555555" />
+
+                </LinearLayout>
+
+            </ScrollView>
+
+        </HorizontalScrollView>
+
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- 📌 로딩바 -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/loadingProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:indicatorSize="72dp"
+        app:trackThickness="8dp"
+        app:indicatorColor="@color/loading_indicator_color"
+        app:trackColor="@color/loading_indicator_track"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

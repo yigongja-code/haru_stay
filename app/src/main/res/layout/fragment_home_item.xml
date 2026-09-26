@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="8dp"
+    android:gravity="center_vertical"
+    android:background="@android:color/white">
+
+    <!-- ✂️ [삭제 완료] 더 이상 아이템마다 개별 눈금을 그리지 않습니다. -->
+    <!-- 대신 전체 화면 배경에 거대한 눈금이 하나만 깔릴 예정입니다. -->
+
+    <!-- 오른쪽: 내용 블록 카드 (시간대별로 위치만 조정됨) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#F0F4F8"
+        android:padding="12dp"
+        android:layout_marginLeft="70dp"> <!-- 📌 중요: 왼쪽에 타임라인 축이 들어갈 공간을 비워둠 -->
+
+        <TextView
+            android:id="@+id/textViewLogAdm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="위치 / 상태 내용"
+            android:textSize="14sp"
+            android:textColor="#222222"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textViewLogWifi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="서브 와이파이 정보"
+            android:textSize="12sp"
+            android:textColor="#777777"
+            android:layout_marginTop="4dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

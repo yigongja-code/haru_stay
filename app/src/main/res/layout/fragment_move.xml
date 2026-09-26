@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 카카오 지도 -->
+    <com.kakao.vectormap.MapView
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 아래에서 올라오는 바텀시트 -->
+    <FrameLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        app:behavior_peekHeight="60dp"
+        app:behavior_hideable="false"
+        app:behavior_skipCollapsed="false"
+        app:layout_behavior="com.example.haru_spot.ui.fragment.testfragment.DragAreaBottomSheetBehavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- 바텀시트 드래그 영역
+                 손잡이 + 날짜 이동 부분까지 이 영역에서 BottomSheet를 움직인다. -->
+            <LinearLayout
+                android:id="@+id/bottom_sheet_drag_area"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- 바텀시트 손잡이 -->
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="#999999" />
+
+                <!-- 날짜 이동 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- 이전 날짜 -->
+                    <TextView
+                        android:id="@+id/btn_prev_date"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="◀"
+                        android:textSize="18sp" />
+
+                    <!-- 현재 날짜 -->
+                    <TextView
+                        android:id="@+id/tv_map_date"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:gravity="center"
+                        android:text="9월 21일"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <!-- 다음 날짜 -->
+                    <TextView
+                        android:id="@+id/btn_next_date"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="▶"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- 경로 목록 영역
+                 이 영역은 RecyclerView가 독립적으로 스크롤한다. -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_map_path"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
