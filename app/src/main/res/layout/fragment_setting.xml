@@ -7,11 +7,52 @@
     android:padding="16dp"
     android:background="@color/timeline_bg">
 
+
+    <!-- 업데이트 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/layout_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:strokeWidth="2dp"
+        app:strokeColor="#2196F3"
+        app:cardBackgroundColor="#F8FBFF"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="◼ 업데이트"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/outline_keyboard_double_arrow_right_24" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
     <!-- 첫 번째 카드 박스: 수집 설정 상세 진입 메뉴 (아이디 통일 완료!) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/layout_move_to_collect_setting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
         app:strokeWidth="2dp"
@@ -33,7 +74,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="◼ 데이터 수집 설정"
+                android:text="◼ 데이터 수집 간격 설정"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/black" />

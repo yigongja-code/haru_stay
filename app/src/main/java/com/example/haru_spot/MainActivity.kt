@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.haru_spot.data.database.AppDatabase
 import com.example.haru_spot.data.database.AppDatabase.Companion.isDataInitialized
 import com.example.haru_spot.databinding.ActivityMainBinding
@@ -31,12 +32,26 @@ import com.example.haru_spot.ui.SettingFragment
 import com.example.haru_spot.ui.StatsFragment
 //import com.example.haru_spot.ui.MoveFragment
 import com.example.haru_spot.service.유틸.TriggerLogToSpot
+import com.example.haru_spot.service.유틸.Update_SheetUtil
 import com.example.haru_spot.service.유틸.UserLocationInputHelper
 import com.example.haru_spot.ui.fragment.MoveFragment
+import com.example.haru_spot.ui.settingfragment.fragment_update_sheet
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 //  호출 TriggerLogToSpot.runIfNeeded(this)
 
 class MainActivity : AppCompatActivity() {
+
+    // 업데이트 시트 마지막 로드 시간
+    var lastUpdateCheckTime = 0L
+
+    // 업데이트 시트에서 불러온 값
+    var updateInfo: Update_SheetUtil.UpdateInfo? = null
 
     private lateinit var binding: ActivityMainBinding
 
@@ -182,40 +197,32 @@ class MainActivity : AppCompatActivity() {
         handleNotificationIntent(intent)
         Log.e("AppDatabase", "🚨온크리에이트 종료")
 
-        /*onBackPressedDispatcher.addCallback(this,
-            object : OnBackPressedCallback(true) {
+        //binding = ActivityMainBinding.inflate(layoutInflater)
+        //setContentView(binding.root)
 
-                override fun handleOnBackPressed() {
+        // ======================================================
+        // 업데이트 카드 버튼
+        // ======================================================
 
-                    val currentFragment =
-                        supportFragmentManager.findFragmentById(R.id.fragment_container)
+        // 무시 → 카드만 닫기
+        binding.btnUpdateIgnore.setOnClickListener {
 
-                    if (currentFragment is HomeFragment) {
+            binding.cardUpdate.visibility = View.GONE
+        }
 
-                        AlertDialog.Builder(
-                            this@MainActivity,
-                            R.style.CustomAlertDialogStyle
-                        )
-                            .setTitle("앱 종료")
-                            .setMessage("하루(Haru) 앱을 종료하시겠습니까?")
-                            .setPositiveButton("예") { _, _ ->
-                                finish()
-                            }
-                            .setNegativeButton("아니오", null)
-                            .show()
+        // 이동 → 카드 닫고 업데이트 상세 화면으로 이동
+        binding.btnUpdateMove.setOnClickListener {
 
-                    } else if (supportFragmentManager.backStackEntryCount > 0) {
+            binding.cardUpdate.visibility = View.GONE
 
-                        // 하위 Fragment에서는 이전 Fragment로 돌아감
-                        supportFragmentManager.popBackStack()
-
-                    } else {
-
-                        // 최상위 Fragment에서는 홈으로 이동
-                        binding.bottomNavigation.selectedItemId = R.id.nav_bar
-                    }
-                }
-            })*/
+            supportFragmentManager.beginTransaction()
+                .replace(
+                    R.id.fragment_container,
+                    fragment_update_sheet()
+                )
+                .addToBackStack(null)
+                .commit()
+        }
     }
     //위치추가 알림용
     override fun onNewIntent(intent: Intent) {
@@ -244,6 +251,9 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        //구글시트로 업데이트 확인
+        checkUpdateSheet()
+
         Log.e(
             "AppDatabase",
             "🚨 [onResume] DB 준비완료 / waitingForSettings=$waitingForSettings"
@@ -264,7 +274,9 @@ class MainActivity : AppCompatActivity() {
         waitingSettingsStep = null
         resumePermissionFlowAfterSettings()
         TriggerLogToSpot.runIfNeeded(this)
-    }
+
+
+        }
 
     // ------------------------------------------------------------
     // 6. 권한 요청 결과 - 포그라운드 위치
@@ -840,4 +852,97 @@ class MainActivity : AppCompatActivity() {
                 show()
             }*/
     }
+
+    private fun checkUpdateSheet() {
+
+        lifecycleScope.launch {
+
+            // ======================================================
+            // 전역변수에 시트를 마지막으로 로드한 시간을 저장
+            // 마지막 로드 후 1일이 지나지 않았으면 리턴
+            // 시트에서 불러온 값은 전역변수에 저장
+            // 현재 앱 버전과 시트 버전을 비교하여 업데이트 카드 표시 여부 결정
+            // ======================================================
+
+            val oneDayMillis = 24 * 60 * 60 * 1000L
+            val currentTime = System.currentTimeMillis()
+
+            // 테스트 중이라 주석처리 시간비교
+            if (
+                lastUpdateCheckTime != 0L &&
+                currentTime - lastUpdateCheckTime < oneDayMillis
+            ) {
+                return@launch
+            }
+
+            val result =
+                Update_SheetUtil(this@MainActivity).sheetLoad()
+
+            // 시트 로딩 성공 시에만 시간과 값을 저장
+            // 시트 로딩 성공 시에만 시간과 값을 저장
+            if (result != null) {
+
+                Log.d(
+                    "Update_SheetUtil",
+                    "📋 시트 결과 확인 = $result"
+                )
+
+                Log.d(
+                    "Update_SheetUtil",
+                    "📋 시트 versionCode = ${result.versionCode}"
+                )
+
+                Log.d(
+                    "Update_SheetUtil",
+                    "📋 현재 앱 versionCode = ${BuildConfig.VERSION_CODE}"
+                )
+
+                Log.d(
+                    "Update_SheetUtil",
+                    "📋 버전 비교 결과 = ${result.versionCode > BuildConfig.VERSION_CODE}"
+                )
+
+                updateInfo = result
+                lastUpdateCheckTime = System.currentTimeMillis()
+
+
+                //날짜 형식변환
+                val displayDate =
+                    Instant.parse(result.date)
+                        .atZone(ZoneId.of("Asia/Seoul"))
+                        .format(
+                            DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
+                        )
+
+                // 현재 앱 버전과 시트 버전 비교
+                if (result.versionCode > BuildConfig.VERSION_CODE) {
+
+                    Log.d(
+                        "Update_SheetUtil",
+                        "🚨 업데이트 카드 표시 조건 통과"
+                    )
+
+                    binding.tvUpdateVersion.text =
+                        "버전  ${result.versionName}"
+
+
+                    binding.tvUpdateDate.text =
+                        "날짜  $displayDate"
+
+                    binding.tvUpdateTitle.text =
+                        result.title
+
+                    binding.cardUpdate.visibility =
+                        View.VISIBLE
+
+                    Log.d(
+                        "Update_SheetUtil",
+                        "🚨 업데이트 카드 표시 완료"
+                    )
+                }
+            }
+        }
+    }
+
+
 }

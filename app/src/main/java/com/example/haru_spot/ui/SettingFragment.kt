@@ -13,6 +13,7 @@ import com.example.haru_spot.ui.settingfragment.fragment_copyright
 import com.example.haru_spot.ui.settingfragment.fragment_data_management_setting
 import com.example.haru_spot.ui.settingfragment.fragment_home_rebuild
 import com.example.haru_spot.ui.settingfragment.fragment_info
+import com.example.haru_spot.ui.settingfragment.fragment_update_sheet
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class SettingFragment : Fragment() {
@@ -39,6 +40,18 @@ class SettingFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_setting, container, false)
+
+
+        // 💡 업데이트
+        val layoutUpdate = view.findViewById<View>(R.id.layout_update)
+
+        layoutUpdate.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment_update_sheet())
+                .addToBackStack(null)
+                .commit()
+        }
+
 
         // 1💡 데이터 수집 설정
         val layoutCollectSetting = view.findViewById<View>(R.id.layout_move_to_collect_setting)

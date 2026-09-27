@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.haru_spot.data.database.AppDatabase
 import com.example.haru_spot.data.entity.Spot
 import com.example.haru_spot.data.entity.Sum_db
+import com.example.haru_spot.service.유틸.Update_SheetUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -104,6 +105,32 @@ class SumUtil {
                     )
                 }
 
+            // ======================================================
+            // 구글시트 부르는 유틸을 호출
+            // ======================================================
+            // 로딩시간이 오히려 늘어서 주석처리- 메인엑티비티로 이동.
+            /*val oneDayMillis = 24 * 60 * 60 * 1000L
+
+            if (
+                managementRow == null ||
+                managementRow.sumStayMinutes == 0L ||
+                System.currentTimeMillis() - managementRow.sumStayMinutes >= oneDayMillis
+            ) {
+
+                Log.d("Update_SheetUtil", "시트 호출 조건 통과 → sheetLoad() 실행")
+                Update_SheetUtil(context).sheetLoad()
+
+                // 시트 확인 시간 기록
+                val updatedManagement =
+                    managementRow.copy(
+                        sumStayMinutes = System.currentTimeMillis()
+                    )
+
+                withContext(Dispatchers.IO) {
+                    sumDao.updateSum(updatedManagement)
+                }
+
+            }*/
 
             // ======================================================
             // 관리행이 없으면
