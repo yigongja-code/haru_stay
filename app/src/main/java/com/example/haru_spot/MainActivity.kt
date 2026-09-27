@@ -182,7 +182,7 @@ class MainActivity : AppCompatActivity() {
         handleNotificationIntent(intent)
         Log.e("AppDatabase", "🚨온크리에이트 종료")
 
-        onBackPressedDispatcher.addCallback(this,
+        /*onBackPressedDispatcher.addCallback(this,
             object : OnBackPressedCallback(true) {
 
                 override fun handleOnBackPressed() {
@@ -215,7 +215,7 @@ class MainActivity : AppCompatActivity() {
                         binding.bottomNavigation.selectedItemId = R.id.nav_bar
                     }
                 }
-            })
+            })*/
     }
     //위치추가 알림용
     override fun onNewIntent(intent: Intent) {

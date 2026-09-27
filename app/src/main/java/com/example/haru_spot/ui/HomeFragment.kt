@@ -209,7 +209,7 @@ class HomeFragment : Fragment() {
         }
 
         // 📌 1층 메인 화면 전용 '뒤로 가기' (예/아니오 종료 다이얼로그)
-        /* mainBackPressedCallback = object : OnBackPressedCallback(true) {
+         mainBackPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 AlertDialog.Builder(requireContext(),R.style.CustomAlertDialogStyle)
                     .setTitle("앱 종료")
@@ -223,7 +223,7 @@ class HomeFragment : Fragment() {
         }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, mainBackPressedCallback!!)
 
-         */
+
     }
 
     // 📌 2층 상세 팝업을 띄우고 애니메이션을 실행하는 함수

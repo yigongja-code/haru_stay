@@ -7,12 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.haru_spot.R
 import com.example.haru_spot.data.database.AppDatabase
 import com.example.haru_spot.data.entity.Sum_db
 import com.example.haru_spot.util.SumUtil
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,6 +40,23 @@ class StatsFragment : Fragment() {
     private var cachedVisitRanking: List<Sum_db> = emptyList()
     private var cachedStayRanking: List<Sum_db> = emptyList()
 
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        //뒤로가기 누르면 홈프레그먼트로 가기
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+
+                override fun handleOnBackPressed() {
+                    requireActivity()
+                        .findViewById<BottomNavigationView>(R.id.bottom_navigation)
+                        .selectedItemId = R.id.nav_bar
+                }
+            }
+        )
+    }
 
     // ==========================================================
     // View 생성

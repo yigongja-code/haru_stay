@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.example.haru_spot.R
 import com.example.haru_spot.ui.settingfragment.fragment_collect
@@ -12,8 +13,26 @@ import com.example.haru_spot.ui.settingfragment.fragment_copyright
 import com.example.haru_spot.ui.settingfragment.fragment_data_management_setting
 import com.example.haru_spot.ui.settingfragment.fragment_home_rebuild
 import com.example.haru_spot.ui.settingfragment.fragment_info
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class SettingFragment : Fragment() {
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        //뒤로가기시 홈프레그먼트로 가기
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+
+                override fun handleOnBackPressed() {
+                    requireActivity()
+                        .findViewById<BottomNavigationView>(R.id.bottom_navigation)
+                        .selectedItemId = R.id.nav_bar
+                }
+            }
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

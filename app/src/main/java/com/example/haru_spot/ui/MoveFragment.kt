@@ -33,8 +33,10 @@ import com.kakao.vectormap.shape.PolylineOptions
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 
@@ -81,6 +83,19 @@ class MoveFragment : Fragment(R.layout.fragment_move) {
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
+
+        //뒤로가기 누르면 홈으로 가기
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+
+                override fun handleOnBackPressed() {
+                    requireActivity()
+                        .findViewById<BottomNavigationView>(R.id.bottom_navigation)
+                        .selectedItemId = R.id.nav_bar
+                }
+            }
+        )
 
         mapView = view.findViewById(R.id.map_view)
 

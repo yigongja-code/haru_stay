@@ -35,11 +35,13 @@ import java.io.File
 import java.io.FileWriter
 import android.os.CountDownTimer
 import android.view.MotionEvent
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import com.example.haru_spot.data.entity.BusStopEntity
 import com.example.haru_spot.service.유틸.userGpsSync
 import com.example.haru_spot.ui.adapter.PopupBusItem
 import com.example.haru_spot.data.entity.Spot
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 //import android.view.View
 
@@ -90,7 +92,24 @@ class DatabaseFragment : Fragment() {
     private lateinit var tvSpSpotTime: TextView
     private lateinit var tvSpMemoId: TextView
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
+        //뒤로가기 눌렀음때 홈으로 가기
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+
+                override fun handleOnBackPressed() {
+                    requireActivity()
+                        .findViewById<BottomNavigationView>(R.id.bottom_navigation)
+                        .selectedItemId = R.id.nav_bar
+                }
+            }
+        )
+
+        // 나머지 초기화...
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -154,6 +173,8 @@ class DatabaseFragment : Fragment() {
         val btnSpotPrev = view.findViewById<Button>(R.id.t_sp_button_prev)
         val btnSpotNext = view.findViewById<Button>(R.id.t_sp_button_next)
         val btnSpotJumpCalendar = view.findViewById<Button>(R.id.tvSpPageInfo)
+
+
 
 
 
