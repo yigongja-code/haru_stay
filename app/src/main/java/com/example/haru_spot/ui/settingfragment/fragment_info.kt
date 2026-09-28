@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.example.haru_spot.BuildConfig
 import com.example.haru_spot.R
 import com.google.android.material.card.MaterialCardView
 
@@ -32,6 +33,10 @@ class fragment_info : Fragment() {
         backButton.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
+
+        //타이틀 뒤에 버전을 붙임
+        val versionText = view.findViewById<TextView>(R.id.text_version)
+        versionText.text = "v${BuildConfig.VERSION_NAME}"
 
         // 1. Haru_Stay 소개
         val infoText = view.findViewById<TextView>(R.id.text_info_1)

@@ -101,6 +101,14 @@
                         android:textStyle="bold"
                         android:textColor="@android:color/black" />
 
+                    <TextView
+                        android:id="@+id/text_version"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textColor="#888888"
+                        android:layout_marginStart="8dp" />
+
                 </LinearLayout>
 
                 <!-- 구분선 -->
