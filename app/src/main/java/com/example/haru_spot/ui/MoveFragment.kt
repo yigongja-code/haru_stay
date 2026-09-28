@@ -48,9 +48,9 @@ class MoveFragment : Fragment(R.layout.fragment_move) {
     private var mapDate = LocalDate.now()
 
     // 지도에서 이동으로 인정할 최소 거리
-    // 즐겨찾기 거리 기준과 동일하게 20m 사용
+    // 즐겨찾기 거리 기준과 동일하게 20m 사용 -> 100으로 사용
     private companion object {
-        const val MAP_MOVE_DISTANCE = 20.0
+        const val MAP_MOVE_DISTANCE = 100.0
     }
 
     //지도의 줌값

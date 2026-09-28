@@ -138,7 +138,7 @@ class fragment_update_sheet : Fragment() {
                 )
 
         updateVersionDate.text =
-            "버전 ${updateInfo.versionName} · $displayDate"
+            "버전 ${updateInfo.versionName} · $displayDate (현재버전 ${BuildConfig.VERSION_NAME})"
 
         updateContent.text =
             updateInfo.content

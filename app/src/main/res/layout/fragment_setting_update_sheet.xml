@@ -100,7 +100,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:backgroundTint="@color/단추색상"
-                        android:text="Play 스토어"
+                        android:text="업데이트"
                         android:textSize="14sp"
                         android:textColor="@android:color/white" />
 
