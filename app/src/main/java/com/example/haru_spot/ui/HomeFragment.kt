@@ -1073,6 +1073,7 @@ class HomeFragment : Fragment() {
                     logDao.getLogsBetween(
                         startTimestamp,
                         endTimestamp
+
                     )
                 }
 
@@ -1086,12 +1087,12 @@ class HomeFragment : Fragment() {
                         sumList
                     )
                 }
-                android.util.Log.e(
+                /*android.util.Log.e(
                     "Statistics",
                     "🔥 loadSpotsForSelectedDate의 sumList 반포 = ${
                         sumList.filter { it.sumAdmCode == "1165010700" }
                     }"
-                )
+                )*/
 
                 binding.homeTimeAxisView.post {
                     binding.homeTimeAxisView.scrollToNoon()

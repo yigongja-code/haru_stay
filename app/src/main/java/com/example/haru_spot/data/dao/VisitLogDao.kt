@@ -82,6 +82,20 @@ interface LogDao {
     //spotdb의 시작시간과 종료시간을 받아와서 logdb의 시작시간  종료시간안의 값음 모두 가져옴
     @Query("SELECT * FROM log_db WHERE logStartTime >= :startTimestamp AND logEndTime <= :endTimestamp AND logEndTime >= 0 ORDER BY logStartTime ASC")
     suspend fun getLogsBetween(startTimestamp: Long, endTimestamp: Long): List<VisitLog>
+    //10분 정규화로 이전dao주석
+    /*@Query("""
+    SELECT * FROM log_db
+    WHERE logStartTime >= (:startTimestamp - 600000)
+      AND logEndTime <= (:endTimestamp + 600000)
+      AND logAdmCode = :admCode
+      AND logEndTime >= 0
+    ORDER BY logStartTime ASC
+""")
+    suspend fun getLogsBetween(
+        startTimestamp: Long,
+        endTimestamp: Long,
+        admCode: String
+    ): List<VisitLog> */
 
     @Query("SELECT * FROM log_db WHERE logGpsLat BETWEEN :minLat AND :maxLat AND logGpsLon BETWEEN :minLon AND :maxLon ")
     suspend fun getLogsInBoundingBox(minLat: Double, maxLat: Double, minLon: Double, maxLon: Double): List<VisitLog>

@@ -175,8 +175,13 @@ class LogToSpotMaker(
         val firstLog = group.first()
         val lastLog = group.last()
 
-        val startTime = firstLog.logStartTime
-        val endTime = if (lastLog.logEndTime != 0L) lastLog.logEndTime else lastLog.logStartTime
+        val startTime = roundTo10Minutes(firstLog.logStartTime)
+
+        val rawEndTime =
+            if (lastLog.logEndTime != 0L) lastLog.logEndTime
+            else lastLog.logStartTime
+
+        val endTime = roundTo10Minutes(rawEndTime)
 
         val validLogs = group.filter {
             val stop = it.logBusStop
@@ -292,5 +297,9 @@ class LogToSpotMaker(
         } catch (e: Exception) {
             Log.e(TAG, "❌ [메모 단독 연동 오류]: ${e.message}")
         }
+    }
+    private fun roundTo10Minutes(time: Long): Long {
+        val tenMinutes = 10 * 60 * 1000L
+        return ((time + tenMinutes / 2) / tenMinutes) * tenMinutes
     }
 }

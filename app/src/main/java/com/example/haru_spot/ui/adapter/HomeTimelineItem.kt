@@ -65,7 +65,22 @@ data class PopupBusItem(
 private fun 많이등장한버정찾기(logs: List<VisitLog>): String? {
     val busStopCounts = linkedMapOf<String, Int>()
 
+    android.util.Log.e(
+        "BUS_STOP_DEBUG-12",
+        "🚌 많이등장한버정찾기() 받은 logs=${logs.size}개"
+    )
+
+
     for (log in logs) {
+
+        android.util.Log.e(
+            "BUS_STOP_DEBUG-12",
+            "   ↳ logId=${log.logId} / " +
+                    "AdmCode=${log.logAdmCode} / " +
+                    "시작=${log.logStartTime} / " +
+                    "종료=${log.logEndTime} / " +
+                    "버정=${log.logBusStop}"
+        )
         val busStop = log.logBusStop?.trim().orEmpty()
 
         // 대표 정류장 후보에서 의미 없는 값은 제외
@@ -233,12 +248,21 @@ fun Spot.toTimelineItems(
     val minutes = this.spSpotTime / (1000 * 60)
 
     // 💡 [핵심] 1차 데이터(rawLogs) 중 현재 Spot의 시간 범위(spStartTime ~ spEndTime)에 포함되는 것만 필터링한 뒤 buslist에 전달
-    //val spotLogs = rawLogs.filter { it.logStartTime in this.spStartTime..this.spEndTime }
-    //val cardBusStopText = buslist(spotLogs)
+
+
+
+    //filter로 걸러내고 있음...
+    //카드별(spot) 이동경로를 만들어줌.
+    val tenMinutes = 10 * 60 * 1000L
 
     val spotLogs = rawLogs.filter {
-        it.logStartTime in this.spStartTime until this.spEndTime
+        it.logStartTime in
+                (this.spStartTime - tenMinutes) until
+                (this.spEndTime + tenMinutes) &&
+                it.logAdmCode == this.spAdmCode
     }
+
+
 
     val spotSumList = sumList.filter {
         it.sumAdmCode == this.spAdmCode
