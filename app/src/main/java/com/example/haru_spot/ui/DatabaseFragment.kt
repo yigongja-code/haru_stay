@@ -276,7 +276,9 @@ class DatabaseFragment : Fragment() {
         // 즉시수집
         btnImmediateCollect.setOnClickListener {
 
-            viewLifecycleOwner.lifecycleScope.launch {
+            immediateCollect()
+
+           /* viewLifecycleOwner.lifecycleScope.launch {
 
                 val db = AppDatabase.getDatabase(requireContext())
 
@@ -330,7 +332,7 @@ class DatabaseFragment : Fragment() {
                     }
 
                 requireContext().startService(intent)
-            }
+            }*/
 
         }
 
@@ -1093,6 +1095,64 @@ class DatabaseFragment : Fragment() {
                 "해당 날짜에 SPOT 데이터가 없습니다.",
                 Toast.LENGTH_SHORT
             ).show()
+        }
+    }
+
+    //즉시수집 함수
+    private fun immediateCollect() {
+
+        viewLifecycleOwner.lifecycleScope.launch {
+
+            val db = AppDatabase.getDatabase(requireContext())
+
+            // 가장 최근 로그의 시작시간만 가져옴
+            val latestStartTime =
+                withContext(Dispatchers.IO) {
+                    db.logDao().가장최근의로그시작시간가져옴()
+                }
+
+            val now = System.currentTimeMillis()
+
+            // 최근 로그가 있고, 시작 후 60초 이내라면 즉시수집 차단
+            if (latestStartTime != null) {
+
+                val nextCollectTime = latestStartTime + 60_000L
+
+                if (now < nextCollectTime) {
+
+                    val remainSeconds =
+                        ((nextCollectTime - now) / 1_000L).coerceAtLeast(1L)
+
+                    Toast.makeText(
+                        requireContext(),
+                        "약 ${remainSeconds}초 후 수집 가능합니다.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    return@launch
+                }
+            }
+
+            // 즉시수집 실행
+            Toast.makeText(
+                requireContext(),
+                "즉시 수집 요청됨",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            // 포그라운드 서비스 다시 깨우기
+            requireContext().startForegroundService(
+                Intent(requireContext(), ForegroundService::class.java).apply {
+                    action = "ACTION_START"
+                }
+            )
+
+            val intent =
+                Intent(requireContext(), LogCollectService::class.java).apply {
+                    action = "ACTION_COLLECT"
+                }
+
+            requireContext().startService(intent)
         }
     }
 

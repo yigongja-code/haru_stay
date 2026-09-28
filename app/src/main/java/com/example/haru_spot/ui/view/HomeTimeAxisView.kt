@@ -1,6 +1,8 @@
 package com.example.haru_spot.ui.view
 
+import android.R.attr.action
 import android.content.Context
+import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -9,14 +11,23 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import com.example.haru_spot.R
+import com.example.haru_spot.data.database.AppDatabase
+import com.example.haru_spot.service.ForegroundService
+import com.example.haru_spot.service.LogCollectService
 import com.example.haru_spot.ui.adapter.HomeTimelineItem
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import com.example.haru_spot.service.유틸.UserLocationInputHelper
 import com.example.haru_spot.service.유틸.SearchAdm
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class HomeTimeAxisView(context: Context, attrs: AttributeSet) : View(context, attrs) {
@@ -305,96 +316,115 @@ class HomeTimeAxisView(context: Context, attrs: AttributeSet) : View(context, at
                 //==============================================
                 // 🔍 [검색 모드 배너]가 켜져 있을 때 터치 영역 판정
                 //==============================================
-                //테스트용으로 이프 주석
+                // 1. [검색 모드 배너] 터치 판정
                 if (searchKeyword.isNotEmpty()) {
-                // onDraw에서 그린 박스 좌표 공식과 완벽히 동일하게 맞춤
                     val boxRight = width - 30f
-                    val boxBottom = height - 540f
+                    val boxBottom = height - 770f
                     val boxLeft = boxRight - 150f
                     val boxTop = boxBottom - 130f
 
-                    //android.util.Log.d("SearchModeTouch", "터치 좌표: x=${event.x}, y=${event.y} | 박스범위: l=$boxLeft, t=$boxTop, r=$boxRight, b=$boxBottom")
-
                     if (event.x in boxLeft..boxRight && event.y in boxTop..boxBottom) {
-                        // 1. 검색어 및 에폭 리스트 초기화
-                        isPinButtonAction = true // 스와이프/드래그 오작동 방지 플래그 활
-
-                      //  android.util.Log.d("SearchModeTouch", "✨ 검색 모드 박스 클릭됨! 초기화 수행")
-                        // 1. 검색어 및 에폭 리스트 초기화
-
+                        isPinButtonAction = true
                         searchKeyword = ""
                         searchEpochs.clear()
-
-                        // 2. 화면 갱신해서 원래 색상으로 복구
-                        //invalidate()
-                        // 💡 [핵심] SearchAdm 내부에 남은 검색 상태와 결과도 함께 싹 초기화!
-                        //SearchAdm.clearSearchState()
-                        // 💡 [핵심 로직]
-                        // 현재 메인 뷰의 검색어가 비어있는 상태(검색 모드가 꺼진 상태)라면,
-                        // 돋보기를 누를 때 SearchAdm 내부의 입력창과 결과 리스트도 깨끗하게 리셋시킵니다!
-                        // 2. 💡 [핵심] SearchAdm이 쥐고 있던 다이얼로그 창 자체를 통째로 파괴!
                         SearchAdm.destroyDialog()
                         invalidate()
-
-
-                        //return true // 터치 이벤트 소모 (뒤로 흘러가지 않음)
                     }
                 }
 
-                // ==========================================
-                // 🔍 [돋보기 버튼] 터치 영역 판정 (확정된 좌표 연동!)
-                // ==========================================
+                // 2. [위치 검색 돋보기 버튼] 터치 판정
                 val searchCenterX = width - 100f
-                val searchCenterY = height - 430f // 형님이 확정하신 바로 그 위치!
+                val searchCenterY = height - 660f
                 val buttonSearchRadius = 75f
-
                 val dxSearch = event.x - searchCenterX
                 val dySearch = event.y - searchCenterY
 
-
-                // 원의 반지름 제곱 범위 내에 터치 좌표가 들어왔는지 검사
                 if (dxSearch * dxSearch + dySearch * dySearch <= buttonSearchRadius * buttonSearchRadius) {
-                    isPinButtonAction = true // 스와이프/드래그 오작동 방지 플래그 활용
-
-                    // 🔍 [TODO] 돋보기 버튼을 눌렀을 때 실행할 기능(예: 검색 팝업이나 특정 위치 이동 등)을 여기에 구현하세요!
+                    isPinButtonAction = true
                     SearchAdm.showSearchDialog(
                         context,
-
-                        onTimeSelected = { selectedStartTime ->
-                            scrollToTime(selectedStartTime)
-                        },
-
-                        onSearchMatched = { epochs ->
-                            setMatchedSearchEpochs(epochs)
-                        },
-
-                        onKeywordSubmitted = { keyword ->
-                            android.util.Log.d(
-                                "SearchKeyword",
-                                "받은 키워드: $keyword"
-                            )
-
-                            // 여기서 View가 keyword를 사용하면 됨
-                            // 예:
-                            searchKeyword = keyword
-                            // invalidate()
-                        }
+                        onTimeSelected = { selectedStartTime -> scrollToTime(selectedStartTime) },
+                        onSearchMatched = { epochs -> setMatchedSearchEpochs(epochs) },
+                        onKeywordSubmitted = { keyword -> searchKeyword = keyword }
                     )
-
-                    //return true
                 }
 
-                // 📌 [핀 버튼 터치 영역 감지]
-                // ==========================================
-                // 📍 [기준점 추가 핀 버튼] 터치 영역 판정 (기존 코드)
-                // ==========================================
-                val iconCenterX = width.toFloat() - 100f
-                val iconCenterY = height.toFloat() - 200f
-                val touchRadius = 150f
+                // 3. [즉시 수집 버튼] 터치 판정 (기존 핀 위치가 위로 올라간 영역)
+                val collectCenterX = width - 100f
+                val collectCenterY = height - 430f
+                val collectTouchRadius = 75f
+                val dxCollect = event.x - collectCenterX
+                val dyCollect = event.y - collectCenterY
 
-                if (abs(event.x - iconCenterX) <= touchRadius && abs(event.y - iconCenterY) <= touchRadius) {
-                    isPinButtonAction = true // 👈 핀 버튼을 눌렀다고 기록하여 뒤의 스와이프 오작동 방지
+                if (dxCollect * dxCollect + dyCollect * dyCollect <= collectTouchRadius * collectTouchRadius) {
+                    isPinButtonAction = true
 
+                    CoroutineScope(Dispatchers.Main).launch {
+
+                        val db = AppDatabase.getDatabase(context)
+
+                        // 가장 최근 로그의 시작시간만 가져옴
+                        val latestStartTime =
+                            withContext(Dispatchers.IO) {
+                                db.logDao().가장최근의로그시작시간가져옴()
+                            }
+
+                        val now = System.currentTimeMillis()
+
+                        // 최근 로그가 있고, 시작 후 60초 이내라면 즉시수집 차단
+                        if (latestStartTime != null) {
+
+                            val nextCollectTime = latestStartTime + 60_000L
+
+                            if (now < nextCollectTime) {
+
+                                val remainSeconds =
+                                    ((nextCollectTime - now) / 1_000L).coerceAtLeast(1L)
+
+                                Toast.makeText(
+                                    context,
+                                    "약 ${remainSeconds}초 후 수집 가능합니다.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                return@launch
+                            }
+                        }
+
+                        // 즉시수집 실행
+                        Toast.makeText(
+                            context,
+                            "즉시 수집 요청됨",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        // 포그라운드 서비스 다시 깨우기
+                        context.startForegroundService(
+                            Intent(context, ForegroundService::class.java).apply {
+                                action = "ACTION_START"
+                            }
+                        )
+
+                        val intent =
+                            Intent(context, LogCollectService::class.java).apply {
+                                action = "ACTION_COLLECT"
+                            }
+
+                        context.startService(intent)
+                    }
+
+                    return true
+                }
+
+                // 4. [즐겨찾기 추가 버튼] 터치 판정 (최하단 별 버튼 영역)
+                val starCenterX = width - 100f
+                val starCenterY = height - 200f
+                val starTouchRadius = 75f
+                val dxStar = event.x - starCenterX
+                val dyStar = event.y - starCenterY
+
+                if (dxStar * dxStar + dyStar * dyStar <= starTouchRadius * starTouchRadius) {
+                    isPinButtonAction = true
                     UserLocationInputHelper.saveUserLocation(context)
                 }
 
@@ -1109,78 +1139,63 @@ class HomeTimeAxisView(context: Context, attrs: AttributeSet) : View(context, at
 
 
         canvas.restore() // (우측 박스 영역의 canvas.restore는 여기서 정상적으로 닫힙니다)
-        //===========================================
-        // 🔍 검색 중일 때만 상단에 검색 모드 배너 렌더링
-        //===========================================
-        //테스트로 if 지움
+        // ==========================================
+        // 🔍 1. [검색 모드 배너] 렌더링
+        // ==========================================
         if (searchKeyword.isNotEmpty()) {
-            // 화면 스크롤에 구애받지 않고 상단에 고정되도록 currentTranslateY를 보정하거나
-            // 혹은 캔버스 기준으로 적절한 위치에 박습니다. (여기서는 상단 패딩 안쪽 고정 좌표 예시)
-        // 화면 우하단 기준 고정 좌표 (해상도 무관하게 항상 우하단 버튼 위쪽에 위치)
-        // 우하단 돋보기 버튼(height - 430f) 기준 바로 위쪽 공간에 배치
-        val boxRight = width - 30f
-        val boxBottom = height - 540f // 돋보기 버튼 위쪽
-        val boxLeft = boxRight - 140f // 돋보기 지름과 비슷한 크기 (150px)
-        val boxTop = boxBottom - 120f // 높이
+            val boxRight = width - 30f
+            val boxBottom = height - 770f
+            val boxLeft = boxRight - 140f
+            val boxTop = boxBottom - 120f
 
-        val searchModeRect = RectF(boxLeft, boxTop, boxRight, boxBottom)
+            val searchModeRect = RectF(boxLeft, boxTop, boxRight, boxBottom)
+            canvas.drawRoundRect(searchModeRect, 16f, 16f, searchModeBgPaint)
+            canvas.drawRoundRect(searchModeRect, 16f, 16f, searchModeStrokePaint)
 
-        // 1. 네모 배경 및 테두리 그리기
-        canvas.drawRoundRect(searchModeRect, 16f, 16f, searchModeBgPaint)
-        canvas.drawRoundRect(searchModeRect, 16f, 16f, searchModeStrokePaint)
+            val textPaintForBox = Paint(searchModeTextPaint).apply {
+                textSize = 35f
+                textAlign = Paint.Align.CENTER
+            }
 
-        // 2. "검 색" / "모 드" 두 줄 텍스트 예쁘게 중앙 정렬해서 넣기
-
-        val textPaintForBox = Paint(searchModeTextPaint).apply {
-            textSize = 35f
-            textAlign = Paint.Align.CENTER
-        }
-
-        val centerX = (boxLeft + boxRight) / 2f
-        canvas.drawText("검 색", centerX, boxTop + 55f, textPaintForBox)
-        canvas.drawText("모 드", centerX, boxTop + 100f, textPaintForBox)
-        canvas.drawText("x", centerX + 50 , boxTop + 30f, textPaintForBox)
+            val centerX = (boxLeft + boxRight) / 2f
+            canvas.drawText("검 색", centerX, boxTop + 55f, textPaintForBox)
+            canvas.drawText("모 드", centerX, boxTop + 100f, textPaintForBox)
+            canvas.drawText("x", centerX + 50, boxTop + 30f, textPaintForBox)
         }
 
         // ==========================================
-        // 📌 [수정] 돋보기 버튼 (기존 기준점 버튼 위쪽)
+        // 🔍 2. [위치 검색 돋보기 버튼] (Y: height - 660f)
         // ==========================================
-        val searchCenterX = width - 100f // 나중에 이 위치만 바꾸면 돋보기 통째로 이동!
-        val searchCenterY = height - 430f // 핀보다 위쪽에 두고 싶을 때 독립적으로 조절 가능!
+        val searchCenterX = width - 100f
+        val searchCenterY = height - 660f
         val buttonSearchRadius = 75f
 
-        // A. 돋보기 배경 원 그리기 (기존 흰색 배경)
         canvas.drawCircle(searchCenterX, searchCenterY - 5f, buttonSearchRadius, pinButtonBgPaint)
         canvas.drawCircle(searchCenterX, searchCenterY - 5f, buttonSearchRadius, pinButtonStrokePaint)
 
-        // B. ⭐️ [핵심 수정] 돋보기 모양 그리기 (이제 테두리도 빨간색!)
         val searchStrokePaint = Paint().apply {
-            // 💡 색상을 빨간색(pinRedPaint)으로 변경!
-            color = 0xFF5A738E.toInt() // 강렬한 빨간색 톤
+            color = 0xFF5A738E.toInt()
             style = Paint.Style.STROKE
             strokeWidth = 8f
             isAntiAlias = true
         }
         val handlePaint = Paint().apply {
-            // 💡 손잡이도 빨간색으로 변경!
             color = 0xFF5A738E.toInt()
             style = Paint.Style.STROKE
             strokeWidth = 15f
-            strokeCap = android.graphics.Paint.Cap.ROUND
+            strokeCap = Paint.Cap.ROUND
             isAntiAlias = true
         }
 
         val searchRadius = 35f
-        // 원 중심을 searchCenterY에 딱 맞게 조정!
-        canvas.drawCircle(searchCenterX-5f, searchCenterY-15f, searchRadius, searchStrokePaint)
+        canvas.drawCircle(searchCenterX - 5f, searchCenterY - 15f, searchRadius, searchStrokePaint)
 
-        // 손잡이 각도를 살짝 더 아래쪽(50도)으로 자연스럽게 조절!
         val handlePath = android.graphics.Path().apply {
             val startAngle = 15f.toDouble()
             val startX = searchCenterX + searchRadius - 17f * Math.cos(Math.toRadians(startAngle)).toFloat()
             val startY = searchCenterY + searchRadius - 58f * Math.sin(Math.toRadians(startAngle)).toFloat()
 
-            val endX = startX + 15f   //28
+            val endX = startX + 15f
             val endY = startY + 20f
 
             moveTo(startX, startY)
@@ -1188,7 +1203,6 @@ class HomeTimeAxisView(context: Context, attrs: AttributeSet) : View(context, at
         }
         canvas.drawPath(handlePath, handlePaint)
 
-        // C. 돋보기 아래쪽 이름표 ("위치 검색")
         val searchPinTextPaint = Paint().apply {
             color = 0xFF555555.toInt()
             textSize = 35f
@@ -1199,77 +1213,148 @@ class HomeTimeAxisView(context: Context, attrs: AttributeSet) : View(context, at
         canvas.drawText("위치 검색", searchCenterX, searchCenterY + 100f, searchPinTextPaint)
 
         // ==========================================
-        // 📌 2. [기준점 추가 핀 버튼] 독립된 기준 좌표 선언
+        // 📌 3. [즉시 수집 버튼] (기존 핀 아이콘 이관, Y: height - 430f)
         // ==========================================
-        // 1. 버튼 전체 위치 및 크기 설정
-        val pinCenterX = width - 100f
-        val pinCenterY = height - 200f
-        val buttonRadius = 75f // 버튼 전체 배경 크기
+        val collectCenterX = width - 100f
+        val collectCenterY = height - 430f
+        val collectRadius = 75f
 
-        // 2. 핀의 기본 색상 붓 (배경 원과 핀 공통)
-        val pinColorPaint = Paint().apply {
-            color = 0xFF5A738E.toInt() // 형님의 지정 색상
+        val collectColorPaint = Paint().apply {
+            color = 0xFF5A738E.toInt()
             style = Paint.Style.FILL
             isAntiAlias = true
         }
 
-        // 3. 하얀색 배경 원 그리기 (pinButtonBgPaint 사용)
-        canvas.drawCircle(pinCenterX, pinCenterY - 5f, buttonRadius, pinButtonBgPaint)
+        canvas.drawCircle(collectCenterX, collectCenterY - 5f, collectRadius, pinButtonBgPaint)
+        canvas.drawCircle(collectCenterX, collectCenterY - 5f, collectRadius, pinButtonStrokePaint)
 
-        // 4. 은은한 회색 테두리 원 그리기 (pinButtonStrokePaint 사용)
-        canvas.drawCircle(pinCenterX, pinCenterY - 5f, buttonRadius, pinButtonStrokePaint)
-
-        // 5. 핀 뾰족한 하단 부분 (Path)먼저 그리기 (머리 뒤로 깔리도록)
-        val pinPath = android.graphics.Path().apply {
-            val halfWidth = 38f
-            val heightOfSharpPart = 50f
-            moveTo(pinCenterX - halfWidth, pinCenterY - 20f)
-            lineTo(pinCenterX + halfWidth, pinCenterY - 20f)
-            lineTo(pinCenterX, pinCenterY + heightOfSharpPart)
+        val collectPath = android.graphics.Path().apply {
+            val halfW = 38f
+            val sharpH = 50f
+            moveTo(collectCenterX - halfW, collectCenterY - 20f)
+            lineTo(collectCenterX + halfW, collectCenterY - 20f)
+            lineTo(collectCenterX, collectCenterY + sharpH)
             close()
         }
-        canvas.drawPath(pinPath, pinColorPaint)
+        canvas.drawPath(collectPath, collectColorPaint)
 
-        // 6. 핀 머리 큰 동그라미 그리기
-        val headRadius = 38f
-        val headCenterY = pinCenterY - 20f
-        canvas.drawCircle(pinCenterX, headCenterY, headRadius, pinColorPaint)
+        val headR = 38f
+        val headCY = collectCenterY - 20f
+        canvas.drawCircle(collectCenterX, headCY, headR, collectColorPaint)
 
-        // 7. [핵심] 핀 머리 동그라미 *안에* 들어갈 흰색 + 모양 그리기
-        val plusSignPaint = Paint().apply {
+        val collectPlusPaint = Paint().apply {
             color = Color.WHITE
             style = Paint.Style.STROKE
-            strokeWidth = 10f // 굵직하게 해서 눈에 잘 띄게!
+            strokeWidth = 10f
             isAntiAlias = true
-            strokeCap = Paint.Cap.ROUND // 선 끝을 둥글게 처리
+            strokeCap = Paint.Cap.ROUND
         }
+        val pSize = 14f
+        canvas.drawLine(collectCenterX - pSize, headCY, collectCenterX + pSize, headCY, collectPlusPaint)
+        canvas.drawLine(collectCenterX, headCY - pSize, collectCenterX, headCY + pSize, collectPlusPaint)
 
-        val plusSize = 14f // + 기호의 길이 (머리 크기에 딱 맞게 조절)
-        // 가로선
-        canvas.drawLine(pinCenterX - plusSize, headCenterY, pinCenterX + plusSize, headCenterY, plusSignPaint)
-        // 세로선
-        canvas.drawLine(pinCenterX, headCenterY - plusSize, pinCenterX, headCenterY + plusSize, plusSignPaint)
-
-
-
-
-// 2. 만든 붓을 쏙 넣어줍니다!
-        //canvas.drawPath(pinPath, myCustomPaint)
-
-        // 5. 핀 한가운데 하얀색 포인트 동그라미 (pinWhiteInnerPaint 사용)
-        //canvas.drawCircle(pinCenterX, pinCenterY - 20f, 12f, pinWhiteInnerPaint)
-
-        // 4. 📌 [추가] 버튼 아래쪽에 쪼그맣게 이름표 텍스트 달아주기
-        val pinTextPaint = Paint().apply {
-            color = 0xFF555555.toInt() // 진한 회색 톤
-            textSize = 35f             // 버튼 안에 쏙 들어갈 아담한 크기
+        val collectTextPaint = Paint().apply {
+            color = 0xFF555555.toInt()
+            textSize = 35f
             textAlign = Paint.Align.CENTER
             isAntiAlias = true
             setTypeface(android.graphics.Typeface.DEFAULT_BOLD)
         }
-        canvas.drawText("즐겨찾기 추가", pinCenterX, pinCenterY + 100f, pinTextPaint)
+        canvas.drawText("즉시 수집", collectCenterX, collectCenterY + 100f, collectTextPaint)
+
+        // ==========================================
+        // ⭐ 4. [즐겨찾기 추가 버튼] (원 안에 큼직하게 꽉 차는 동글동글 라운드 별, Y: height - 200f)
+        // ==========================================
+        val starCenterX = width - 100f
+        val starCenterY = height - 200f
+        val starButtonRadius = 75f
+
+        // 1. 버튼 배경 및 테두리 원
+        canvas.drawCircle(starCenterX, starCenterY - 5f, starButtonRadius, pinButtonBgPaint)
+        canvas.drawCircle(starCenterX, starCenterY - 5f, starButtonRadius, pinButtonStrokePaint)
+
+        // 2. 버튼 크기에 맞게 시원하게 꽉 차도록 바깥쪽 반지름(outerRadius)을 58f로 확 키움!
+        val starPath = android.graphics.Path().apply {
+            val numPoints = 5
+            val outerRadius = 58f
+            val innerRadius = 27f
+            val angleStep = Math.PI / numPoints
+
+            val points = Array(10) { FloatArray(2) }
+
+            // 별의 10개 꼭짓점 계산
+            for (i in 0 until 10) {
+                val r = if (i % 2 == 0) outerRadius else innerRadius
+                val angle = i * angleStep - Math.PI / 2
+
+                points[i][0] =
+                    starCenterX + (r * Math.cos(angle)).toFloat()
+
+                points[i][1] =
+                    (starCenterY - 5f) + (r * Math.sin(angle)).toFloat()
+            }
+
+            // 각 꼭짓점을 조금씩 잘라서 둥글게 연결
+            for (i in 0 until 10) {
+
+                val prev = points[(i - 1 + 10) % 10]
+                val curr = points[i]
+                val next = points[(i + 1) % 10]
+
+                //val round = if (i % 2 == 0) 20f else 6f
+                // 20f가 별 바깥 꼭지점의 둥근정도
+                val round = if (i % 2 == 0) 20f else 6f
 
 
+                val dx1 = prev[0] - curr[0]
+                val dy1 = prev[1] - curr[1]
+                val len1 = Math.sqrt((dx1 * dx1 + dy1 * dy1).toDouble()).toFloat()
+
+                val dx2 = next[0] - curr[0]
+                val dy2 = next[1] - curr[1]
+                val len2 = Math.sqrt((dx2 * dx2 + dy2 * dy2).toDouble()).toFloat()
+
+                val startX = curr[0] + dx1 / len1 * round
+                val startY = curr[1] + dy1 / len1 * round
+
+                val endX = curr[0] + dx2 / len2 * round
+                val endY = curr[1] + dy2 / len2 * round
+
+                if (i == 0) {
+                    moveTo(startX, startY)
+                } else {
+                    lineTo(startX, startY)
+                }
+
+                quadTo(
+                    curr[0],
+                    curr[1],
+                    endX,
+                    endY
+                )
+            }
+
+            close()
+        }
+
+
+
+        val starPaint = Paint().apply {
+            color = Color.parseColor("#FFC107") // 따뜻한 골드 황금색
+            style = Paint.Style.FILL
+            isAntiAlias = true
+        }
+        canvas.drawPath(starPath, starPaint)
+
+        // 3. 하단 텍스트 레이블
+        val starTextPaint = Paint().apply {
+            color = 0xFF555555.toInt()
+            textSize = 35f
+            textAlign = Paint.Align.CENTER
+            isAntiAlias = true
+            setTypeface(android.graphics.Typeface.DEFAULT_BOLD)
+        }
+        canvas.drawText("즐겨찾기 추가", starCenterX, starCenterY + 100f, starTextPaint)
 
     } // 📌 onDraw 함수의 올바른 닫는 위치
 
