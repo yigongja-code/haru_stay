@@ -1260,7 +1260,7 @@ class HomeTimeAxisView(context: Context, attrs: AttributeSet) : View(context, at
             isAntiAlias = true
             setTypeface(android.graphics.Typeface.DEFAULT_BOLD)
         }
-        canvas.drawText("즉시 수집", collectCenterX, collectCenterY + 100f, collectTextPaint)
+        canvas.drawText("현위치 기록", collectCenterX, collectCenterY + 100f, collectTextPaint)
 
         // ==========================================
         // ⭐ 4. [즐겨찾기 추가 버튼] (원 안에 큼직하게 꽉 차는 동글동글 라운드 별, Y: height - 200f)
@@ -1354,7 +1354,8 @@ class HomeTimeAxisView(context: Context, attrs: AttributeSet) : View(context, at
             isAntiAlias = true
             setTypeface(android.graphics.Typeface.DEFAULT_BOLD)
         }
-        canvas.drawText("즐겨찾기 추가", starCenterX, starCenterY + 100f, starTextPaint)
+        canvas.drawText("즐겨찾기", starCenterX, starCenterY + 100f, starTextPaint)
+        canvas.drawText("현위치 추가", starCenterX, starCenterY + 140f, starTextPaint)
 
     } // 📌 onDraw 함수의 올바른 닫는 위치
 
