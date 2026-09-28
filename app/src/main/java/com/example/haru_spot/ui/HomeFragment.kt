@@ -40,6 +40,9 @@ import com.example.haru_spot.data.entity.VisitLog
 
 class HomeFragment : Fragment() {
 
+
+    //스팟의 가장 오래된 값을 저장할 변수 - 과거이동 방지용
+    private var oldestSpotTime: Long = 0L //893
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -79,8 +82,24 @@ class HomeFragment : Fragment() {
         val today = Calendar.getInstance()
 
         if (targetCal.get(Calendar.YEAR) > today.get(Calendar.YEAR) ||
-            (targetCal.get(Calendar.YEAR) == today.get(Calendar.YEAR) && targetCal.get(Calendar.DAY_OF_YEAR) > today.get(Calendar.DAY_OF_YEAR))) {
+            (targetCal.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                    targetCal.get(Calendar.DAY_OF_YEAR) > today.get(Calendar.DAY_OF_YEAR))) {
             return // 🛑 미래 진입 차단!
+        }
+
+        // 💡 가장 오래된 Spot보다 과거로 가려는 경우 차단
+        if (days < 0 && oldestSpotTime > 0L) {
+            val oldestCal = Calendar.getInstance().apply {
+                timeInMillis = oldestSpotTime
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            if (targetCal.before(oldestCal)) {
+                return // 🛑 데이터가 없는 과거 진입 차단!
+            }
         }
 
         calendar.add(Calendar.DATE, days)
@@ -92,9 +111,6 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        //TriggerLogToSpot.runIfNeeded(this)
-        //TriggerLogToSpot.runIfNeeded(requireContext())
-        //val db = AppDatabase.getDatabase(requireContext())
 
         // 다른 곳 다녀왔으면 묻고 따지지 않고 깔끔하게 처형!
         // 검색모드 초기화
@@ -141,25 +157,7 @@ class HomeFragment : Fragment() {
         //화면띄우기
         loadSpotsForSelectedDate()
 
-        /* 방아쇠 봉인
-        val db = AppDatabase.getDatabase(requireContext())
 
-        // 1. 가공 시작 전 로딩바 켜기 방아쇠
-        binding.loadingProgressBar.visibility = View.VISIBLE
-
-        // 2. 방아쇠를 당기고 실행 여부를 리턴 받음
-        val isStarted = TriggerLogToSpot.runIfNeeded(db) {
-            // [케이스 A] 정상적으로 가공 파이프라인이 다 돌고 끝났을 때
-            requireActivity().runOnUiThread {
-                loadSpotsForSelectedDate()
-                binding.loadingProgressBar.visibility = View.GONE
-            }
-        }
-
-        // [케이스 B] 이미 돌고 있거나 해서 가공이 아예 안 일어났을 때 (즉시 컷)
-        if (!isStarted) {
-            binding.loadingProgressBar.visibility = View.GONE
-        }*/
 
         // 1. 초기 날짜 텍스트 세팅
         updateDateText()
@@ -188,8 +186,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // 6. 최초 진입 시 오늘 날짜 기준 데이터 로드
-        //loadSpotsForSelectedDate()
+
 
         // 7. 타임라인 뷰에서 카드를 터치했을 때 2층 팝업 띄우기 연결
         binding.homeTimeAxisView.setOnCardClickListener { clickedItem ->
@@ -934,6 +931,10 @@ class HomeFragment : Fragment() {
                 val sumList = withContext(Dispatchers.IO) {
                     sumDao.getAllSum()
                 }
+                //데이터가 없는 과거날자 이동 방지용
+                oldestSpotTime = withContext(Dispatchers.IO) {
+                    spotDao.getOldestSpotTime() ?: 0L
+                }
 
                 // =========================================================
                 // ② Spot 데이터 조회
@@ -1185,67 +1186,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    /*private fun showRouteList(
-        rawLogs: List<VisitLog>,
-        onItemSelected: (PopupBusItem) -> Unit
-    ) {
-        val timeFormatter = java.text.SimpleDateFormat("a h:mm", java.util.Locale.KOREA)
 
-        for (log in rawLogs) {
-            val busStopText = log.logBusStop?.ifBlank { "위치 정보 없음" } ?: "위치 정보 없음"
-            val rawTimeStr = timeFormatter.format(java.util.Date(log.logStartTime))
-            val formattedTimeStr = rawTimeStr.replace(Regex(" ([1-9]):")) { " 0${it.groupValues[1]}:" }
-            val gpsRangeVal = log.logGpsRange.toInt()
-            val rangeStr = if (gpsRangeVal > 0) " | GPS 오차: ${gpsRangeVal}m" else ""
-
-            val itemCardLayout = android.widget.LinearLayout(requireContext()).apply {
-                orientation = android.widget.LinearLayout.VERTICAL
-                setPadding(24, 20, 24, 20)
-                setBackgroundColor(android.graphics.Color.parseColor("#F2F3F5"))
-                layoutParams = android.widget.LinearLayout.LayoutParams(
-                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { bottomMargin = 14 }
-            }
-
-            val tvLine1 = android.widget.TextView(requireContext()).apply {
-                text = "◼ $busStopText 인근"
-                textSize = 15f
-                setTypeface(null, android.graphics.Typeface.BOLD)
-                setTextColor(android.graphics.Color.parseColor("#222222"))
-            }
-
-            val tvLine2 = android.widget.TextView(requireContext()).apply {
-                text = "  🕒 $formattedTimeStr$rangeStr"
-                textSize = 12f
-                setTextColor(android.graphics.Color.parseColor("#666666"))
-                setPadding(0, 4, 0, 0)
-            }
-
-            itemCardLayout.addView(tvLine1)
-            itemCardLayout.addView(tvLine2)
-
-            itemCardLayout.setOnClickListener {
-                selectedPopupItem = com.example.haru_spot.ui.adapter.PopupBusItem(
-                    displayText = "$formattedTimeStr - $busStopText 인근",
-                    latitude = log.logGpsLat,
-                    longitude = log.logGpsLon,
-                    busAdmCode = log.logAdmCode,
-                    busAdmName = log.logAdmName
-                )
-
-                for (i in 0 until routeListContainer.childCount) {
-                    val child = routeListContainer.getChildAt(i)
-                    child.setBackgroundColor(android.graphics.Color.parseColor("#F2F3F5"))
-                }
-
-                itemCardLayout.setBackgroundColor(android.graphics.Color.parseColor("#FFF3E0"))
-                panelScrollViewRef?.smoothScrollTo(0, 0)
-            }
-
-            routeListContainer.addView(itemCardLayout)
-        }
-    }*/
 
 
 

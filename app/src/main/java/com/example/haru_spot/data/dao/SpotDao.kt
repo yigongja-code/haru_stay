@@ -201,4 +201,8 @@ interface SpotDao {
         startTime: Long
     ): List<Spot>
 
+    //가장 오래된 spotDB의 시작시간을 가져옴 - 날짜이동시 무한정 과거로 가는거 방지용
+    @Query("SELECT MIN(spStartTime) FROM spot_db")
+    suspend fun getOldestSpotTime(): Long?
+
 }
