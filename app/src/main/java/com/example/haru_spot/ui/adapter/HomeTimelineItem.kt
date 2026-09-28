@@ -215,13 +215,25 @@ fun Spot.toTimelineItems(
         System.currentTimeMillis()
     }
 
-    val rawEndStr = formatter.format(Date(safeEndTime))
-
-    val endStr = if (rawEndStr == "오전 12:00") {
-        formatter.format(Date(safeEndTime + 60_000L))
+    // 자정(오전 12:00)이면 카드 표시용으로 종료시간 1분 증가
+    val midnightSafeEndTime = if (
+        formatter.format(Date(safeEndTime)) == "오전 12:00"
+    ) {
+        safeEndTime + 60_000L
     } else {
-        rawEndStr
-    } // 👈 롱값을 안전하게 문자열로 변환!
+        safeEndTime
+    }
+
+// 시작과 종료가 같으면 카드 표시용으로 종료시간 1분 추가
+    val displayEndTime = if (this.spStartTime == midnightSafeEndTime) {
+        midnightSafeEndTime + 60_000L
+    } else {
+        midnightSafeEndTime
+    }
+
+    val rawEndStr = formatter.format(Date(displayEndTime))
+
+    val endStr = rawEndStr// 👈 롱값을 안전하게 문자열로 변환!
 
     val startDisplayDate = displayDateFormatter.format(Date(this.spStartTime))
     val endDisplayDate = displayDateFormatter.format(Date(this.spEndTime))
