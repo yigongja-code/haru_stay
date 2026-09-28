@@ -591,7 +591,7 @@ class DatabaseFragment : Fragment() {
 
                     spotCurrentIndex = 0
 
-                    tvSpotTableTitle.text = "📍 SPOT DB  (0 / 0)"
+                    tvSpotTableTitle.text = "⏰ 홈 정보 데이터  (0 / 0)"
                     tvSpAdmName.text = ""
                     tvSpAdmCode.text = ""
                     tvSpStartTime.text = ""
@@ -604,7 +604,7 @@ class DatabaseFragment : Fragment() {
 
                 Log.e(
                     "DatabaseFragment",
-                    "❌ SPOT DB 조회 실패: ${e.message}",
+                    "❌ 홈 정보 데이터 조회 실패: ${e.message}",
                     e
                 )
             }
@@ -965,7 +965,7 @@ class DatabaseFragment : Fragment() {
         val spot = list[index]
 
         tvSpotTableTitle.text =
-            "📍 SPOT DB  (${index + 1} / ${list.size})"
+            "⏰ 홈 정보 데이터  (${index + 1} / ${list.size})"
 
         // -----------------------------------------
         // 행정동
@@ -1003,23 +1003,29 @@ class DatabaseFragment : Fragment() {
             }
 
         // -----------------------------------------
-        // 체류시간
-        // spSpotTime은 밀리초
-        // -----------------------------------------
+// 체류시간
+// spSpotTime은 밀리초
+// -----------------------------------------
         val stayMillis =
             spot.spSpotTime.coerceAtLeast(0L)
 
         val totalMinutes =
             stayMillis / (60L * 1000L)
 
+        val days =
+            totalMinutes / (24L * 60L)
+
         val hours =
-            totalMinutes / 60L
+            (totalMinutes % (24L * 60L)) / 60L
 
         val minutes =
             totalMinutes % 60L
 
         tvSpSpotTime.text =
             when {
+                days > 0L ->
+                    "${days}일 ${hours}시간 ${minutes}분"
+
                 hours > 0L ->
                     "${hours}시간 ${minutes}분"
 
