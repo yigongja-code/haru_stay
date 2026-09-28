@@ -714,7 +714,337 @@ class MoveFragment : Fragment(R.layout.fragment_move) {
     }
 
     //점과 점사이 라인을 구성함(폴리라인)
+    //화면에 보이는 부분만 화살표를 그려서 확대 배율시 화살표가 많이 생기지 않게함
+
     private fun kakaoLine(
+        map: KakaoMap,
+        logs: List<VisitLog>,
+        zoom: Int
+    ) {
+
+        val arrowDistance =
+            when {
+                zoom == 6 -> 40000.0
+                zoom == 7 -> 20000.0
+                zoom == 8 -> 10000.0
+                zoom == 9 -> 4000.0
+                zoom == 10 -> 2000.0
+                zoom == 11 -> 1000.0
+                zoom == 12 -> 400.0
+                zoom == 13 -> 200.0
+                zoom == 14 -> 100.0
+                else -> 50.0
+            }
+
+        if (logs.size < 2) return
+
+        val labelLayer =
+            map.labelManager?.getLayer() ?: return
+
+        // ---------------------------------------------------------
+        // 현재 화면 영역 확인
+        // ---------------------------------------------------------
+        val viewport = map.getViewport()
+
+
+
+
+        // 화면 가장자리에서 화살표가 너무 딱 끊기지 않도록
+        // 약간 여유를 둔다.
+        // aa로 화면밖의 여유를 준다
+        val aa = 3000
+
+        val left = viewport.left - aa
+        val top = viewport.top - aa
+        val right = viewport.right + aa
+        val bottom = viewport.bottom + aa
+
+        // ---------------------------------------------------------
+        // "▶" 표시용 스타일
+        // ---------------------------------------------------------
+        val arrowStyles =
+            map.labelManager?.addLabelStyles(
+                LabelStyles.from(
+                    LabelStyle.from()
+                        .setTextStyles(
+                            12,
+                            android.graphics.Color.RED
+                        )
+                )
+            ) ?: return
+
+        var arrowRemain = 0.0
+
+        // ---------------------------------------------------------
+        // 로그와 로그 사이를 하나씩 처리
+        // ---------------------------------------------------------
+        for (i in 0 until logs.lastIndex) {
+
+            val start = logs[i]
+            val end = logs[i + 1]
+
+            val distance =
+                distanceBetween(start, end)
+
+            if (distance <= 0.0) continue
+
+            // -----------------------------------------------------
+            // 현재 선분의 화면 좌표
+            // -----------------------------------------------------
+            val startPoint =
+                map.toScreenPoint(
+                    LatLng.from(
+                        start.logGpsLat,
+                        start.logGpsLon
+                    )
+                )
+
+            val endPoint =
+                map.toScreenPoint(
+                    LatLng.from(
+                        end.logGpsLat,
+                        end.logGpsLon
+                    )
+                )
+
+            if (startPoint == null || endPoint == null) {
+                arrowRemain =
+                    (arrowRemain + distance) % arrowDistance
+                continue
+            }
+
+            // -----------------------------------------------------
+            // 화면 안에 들어오는 선분 구간을 계산한다.
+            //
+            // t = 0.0 → start
+            // t = 1.0 → end
+            // -----------------------------------------------------
+            val visibleRange =
+                clipLineToViewport(
+                    startPoint.x.toDouble(),
+                    startPoint.y.toDouble(),
+                    endPoint.x.toDouble(),
+                    endPoint.y.toDouble(),
+                    left.toDouble(),
+                    top.toDouble(),
+                    right.toDouble(),
+                    bottom.toDouble()
+                )
+
+            // 화면을 전혀 통과하지 않는 선분
+            if (visibleRange == null) {
+
+                arrowRemain =
+                    (arrowRemain + distance) % arrowDistance
+
+                continue
+            }
+
+            val visibleStartDistance =
+                distance * visibleRange.first
+
+            val visibleEndDistance =
+                distance * visibleRange.second
+
+            // -----------------------------------------------------
+            // 로그 사이 거리가 화살표 간격보다 짧으면
+            // 기존처럼 가운데에 화살표 하나 표시
+            // -----------------------------------------------------
+            if (distance < arrowDistance) {
+
+                val arrowPosition = distance * 0.5
+
+                if (
+                    arrowPosition >= visibleStartDistance &&
+                    arrowPosition <= visibleEndDistance
+                ) {
+
+                    val ratio =
+                        arrowPosition / distance
+
+                    addArrow(
+                        labelLayer = labelLayer,
+                        arrowStyles = arrowStyles,
+                        start = start,
+                        end = end,
+                        ratio = ratio
+                    )
+                }
+
+                arrowRemain =
+                    (arrowRemain + distance) % arrowDistance
+
+                continue
+            }
+
+            // -----------------------------------------------------
+            // 화면 안에서 실제로 필요한 화살표 위치만 계산
+            //
+            // 기존처럼 100km 전체를 while 돌지 않는다.
+            // -----------------------------------------------------
+            var arrowPosition =
+                arrowDistance - arrowRemain
+
+            if (arrowPosition < visibleStartDistance) {
+
+                val skipCount =
+                    kotlin.math.ceil(
+                        (visibleStartDistance - arrowPosition) /
+                                arrowDistance
+                    ).toLong()
+
+                arrowPosition +=
+                    skipCount * arrowDistance
+            }
+
+            // -----------------------------------------------------
+            // 화면 안에 들어오는 화살표만 생성
+            // -----------------------------------------------------
+            while (arrowPosition <= visibleEndDistance) {
+
+                val ratio =
+                    arrowPosition / distance
+
+                addArrow(
+                    labelLayer = labelLayer,
+                    arrowStyles = arrowStyles,
+                    start = start,
+                    end = end,
+                    ratio = ratio
+                )
+
+                arrowPosition += arrowDistance
+            }
+
+            // -----------------------------------------------------
+            // 다음 선분에서도 화살표 간격이 이어지도록 유지
+            // -----------------------------------------------------
+            arrowRemain =
+                (arrowRemain + distance) % arrowDistance
+        }
+
+
+        // ---------------------------------------------------------
+        // 전체 이동 경로는 기존처럼 Polyline 하나로 표시
+        // ---------------------------------------------------------
+
+        val shapeLayer =
+            map.shapeManager
+                ?.getLayer()
+                ?: return
+
+        val routePoints =
+            MapPoints.fromLatLng(
+                logs.map { log ->
+                    LatLng.from(
+                        log.logGpsLat,
+                        log.logGpsLon
+                    )
+                }
+            )
+
+        val routeOptions =
+            PolylineOptions.from(
+                routePoints,
+                2.5f,
+                android.graphics.Color.RED
+            )
+
+        shapeLayer.addPolyline(routeOptions)
+    }
+
+    //화살표를 생성하는 보조함수
+    private fun addArrow(
+        labelLayer: com.kakao.vectormap.label.LabelLayer,
+        arrowStyles: LabelStyles,
+        start: VisitLog,
+        end: VisitLog,
+        ratio: Double
+    ) {
+
+        val arrowLat =
+            start.logGpsLat +
+                    (end.logGpsLat - start.logGpsLat) * ratio
+
+        val arrowLon =
+            start.logGpsLon +
+                    (end.logGpsLon - start.logGpsLon) * ratio
+
+        val arrow =
+            labelLayer.addLabel(
+                LabelOptions
+                    .from(
+                        LatLng.from(
+                            arrowLat,
+                            arrowLon
+                        )
+                    )
+                    .setStyles(arrowStyles)
+                    .setTexts(
+                        LabelTextBuilder()
+                            .setTexts("▶")
+                    )
+                    .setTransform(
+                        TransformMethod.AbsoluteRotation
+                    )
+            )
+
+        val angle =
+            kotlin.math.atan2(
+                end.logGpsLon - start.logGpsLon,
+                end.logGpsLat - start.logGpsLat
+            )
+
+        arrow?.rotateTo(
+            (angle - Math.PI / 2.0).toFloat()
+        )
+    }
+
+    //화면과 선분이 만나는 구간 계산 함수
+    private fun clipLineToViewport(
+        x1: Double,
+        y1: Double,
+        x2: Double,
+        y2: Double,
+        left: Double,
+        top: Double,
+        right: Double,
+        bottom: Double
+    ): Pair<Double, Double>? {
+
+        val dx = x2 - x1
+        val dy = y2 - y1
+
+        var tMin = 0.0
+        var tMax = 1.0
+
+        fun update(p: Double, q: Double): Boolean {
+
+            if (p == 0.0) {
+                return q >= 0.0
+            }
+
+            val r = q / p
+
+            if (p < 0.0) {
+                if (r > tMax) return false
+                if (r > tMin) tMin = r
+            } else {
+                if (r < tMin) return false
+                if (r < tMax) tMax = r
+            }
+
+            return true
+        }
+
+        if (!update(-dx, x1 - left)) return null
+        if (!update(dx, right - x1)) return null
+        if (!update(-dy, y1 - top)) return null
+        if (!update(dy, bottom - y1)) return null
+
+        return tMin to tMax
+    }
+    /*private fun kakaoLine(
         map: KakaoMap,
         logs: List<VisitLog>,
         zoom: Int
@@ -936,7 +1266,7 @@ class MoveFragment : Fragment(R.layout.fragment_move) {
 
         shapeLayer.addPolyline(routeOptions)
 
-    }
+    } */
 
     private class MapPathAdapter(
         private val onItemClick: (VisitLog) -> Unit
