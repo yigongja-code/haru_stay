@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/timeline_bg"
+    android:background="@color/background1"
     android:padding="16dp"
     tools:context=".ui.settingfragment.fragment_collect">
 

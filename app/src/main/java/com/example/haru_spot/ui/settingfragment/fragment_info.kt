@@ -18,11 +18,9 @@ class fragment_info : Fragment() {
     ): View {
 
         val view = inflater.inflate(
-            R.layout.fragment_setting_update_sheet,
+            R.layout.fragment_setting_info,
             container,
             false
-
-
         )
 
 

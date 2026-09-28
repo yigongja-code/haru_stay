@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="@color/timeline_bg">
+    android:background="@color/background1"
+    >
 
 
     <!-- 업데이트 -->
