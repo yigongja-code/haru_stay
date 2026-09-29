@@ -107,7 +107,7 @@ class AdmCollector(private val context: Context) {
                 return AdmResult(
                     admCode = nearestFav.favAdmCode,
                     admName = nearestFav.favAdmName,
-                    stopName = nearestFav.favBusStop.ifEmpty { "내 거점" },
+                    stopName = "⭐ ${nearestFav.favBusStop.ifEmpty { "내 거점" }}",
                     city = "",
                     adm = "",
                     centerLat = nearestFav.favGpsLat,
