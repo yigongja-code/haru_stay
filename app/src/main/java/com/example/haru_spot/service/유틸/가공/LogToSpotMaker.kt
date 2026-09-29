@@ -175,38 +175,20 @@ class LogToSpotMaker(
         val firstLog = group.first()
         val lastLog = group.last()
 
-        val startTime = roundTo10Minutes(firstLog.logStartTime)
+        val startTime = roundTo5Minutes(firstLog.logStartTime)
 
         val rawEndTime =
             if (lastLog.logEndTime != 0L) lastLog.logEndTime
             else lastLog.logStartTime
 
-        val endTime = roundTo10Minutes(rawEndTime)
+        val endTime = roundTo5Minutes(rawEndTime)
 
         val validLogs = group.filter {
             val stop = it.logBusStop
             !stop.isNullOrBlank() && !stop.startsWith("[⚠️disconnect]")
         }
 
-        // 💡 1. 정류장별 등장 빈도(오래 머물렀을수록 로그에 많이 찍힘)를 카운트!
-        /*val busStopCounts = validLogs.mapNotNull { it.logBusStop }
-            .groupBy { it }
-            .mapValues { it.value.size }*/
 
-        // 가장 많이 등장한(가장 오래 머문) 정류장을 대표로 선출
-        //val bestBusStop = busStopCounts.maxByOrNull { it.value }?.key ?: (firstLog.logBusStop ?: "")
-
-        // 💡 2. 와이파이와 셀키도 동일하게 빈도수 기반 혹은 깔끔한 대표값으로 처리 가능
-        /*val bestWifi = validLogs.mapNotNull { it.logWifiMac }.groupBy { it }.maxByOrNull { it.value.size }?.key ?: (firstLog.logWifiMac ?: "")
-        val bestCellKey = validLogs.mapNotNull { it.logCellKey }.groupBy { it }.maxByOrNull { it.value.size }?.key ?: (firstLog.logCellKey ?: "")
-
-        val cleanWifi = if (!bestWifi.isNullOrEmpty() && bestWifi.contains("(") && bestWifi.endsWith(")")) {
-            bestWifi.substringAfterLast("(").removeSuffix(")")
-        } else if (bestWifi.isNullOrEmpty()) {
-            "No Signal"
-        } else {
-            bestWifi.trim()
-        }*/
 
         return Spot(
             spId = 0,
@@ -298,8 +280,10 @@ class LogToSpotMaker(
             Log.e(TAG, "❌ [메모 단독 연동 오류]: ${e.message}")
         }
     }
-    private fun roundTo10Minutes(time: Long): Long {
-        val tenMinutes = 10 * 60 * 1000L
-        return ((time + tenMinutes / 2) / tenMinutes) * tenMinutes
+
+    //기본시간을 5분 단위로 맞추기 위해서 반올림
+    private fun roundTo5Minutes(time: Long): Long {
+        val fiveMinutes = 5 * 60 * 1000L
+        return ((time + fiveMinutes / 2) / fiveMinutes) * fiveMinutes
     }
 }
