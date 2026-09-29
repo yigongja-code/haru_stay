@@ -385,6 +385,8 @@ class fragment_userlocation : Fragment() {
                         loadUserLocationList(rootView)
                     }
                 }*/
+                // 리스트 새로고침
+                loadUserLocationList(rootView)
             }
         }
 
@@ -508,8 +510,14 @@ class fragment_userlocation : Fragment() {
                                         selectfavAdmCode = ""
                                         selectfavAdmName = ""
 
+                                        // 수정 후 상단 안내 문구 원복
+                                        val listContainerView = rootView.findViewById<LinearLayout>(R.id.recycler_user_locations)
+                                        val parentCardLayout = listContainerView.parent as? LinearLayout
+                                        val tvGuide = parentCardLayout?.getChildAt(0) as? TextView
+                                        tvGuide?.text = "◼ 아래 리스트에서 선택해주세요"
+
                                         // 리스트 갱신 및 다이얼로그 닫기
-                                        // loadUserLocationList(rootView) // 필요시 호출
+                                        loadUserLocationList(rootView) // 필요시 호출
                                         dismiss()
                                     }
                                 } else {

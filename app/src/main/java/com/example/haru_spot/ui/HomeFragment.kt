@@ -403,7 +403,7 @@ class HomeFragment : Fragment() {
         lateinit var tvListLabel: android.widget.TextView
 
         val btnCheckCoordinate = android.widget.Button(requireContext()).apply {
-            text = "좌표확인"
+            text = "지도확인"
             layoutParams = android.widget.LinearLayout.LayoutParams(
                 0,
                 android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -450,7 +450,7 @@ class HomeFragment : Fragment() {
         }
 
         val btnRegisterLocation = android.widget.Button(requireContext()).apply {
-            text = "위치등록"
+            text = "즐겨찾기 추가"
             layoutParams = android.widget.LinearLayout.LayoutParams(
                 0,
                 android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -600,7 +600,7 @@ class HomeFragment : Fragment() {
 
         // --- 컴포넌트 6: 이동경로 리스트 영역 타이틀 ---
          tvListLabel = android.widget.TextView(requireContext()).apply {
-            text = "  이동 경로-선택하여 좌표확인및 위치등록"
+            text = "  이동 경로-선택하여 지도확인및 즐겨찾기 추가"
             textSize = 14f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(android.graphics.Color.BLACK)
