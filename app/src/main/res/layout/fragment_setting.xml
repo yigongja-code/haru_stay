@@ -116,7 +116,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="◼ 홈화면 정보 카드 복구"
+                android:text="◼ 홈 화면에 오류가 생겼을 때 "
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/black" />

@@ -68,7 +68,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="◼ 홈 화면 정보 카드 복구"
+                android:text="◼ 홈 데이터 초기화 후 재생성 "
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/black"
@@ -106,7 +106,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="• 홈 화면의 정보 카드가 중복되거나 비정상적으로 늘어나거나 쪼개졌을때 사용합니다.\n• 현재 저장된 홈 정보 데이터를 기준으로 홈 화면의 체류 카드를 다시 구성합니다.\n• 일반적인 상황에는 사용할 필요가 없습니다.\n• 휴대폰 성능과 데이터의 크기에 따라 오래걸릴수 있습니다. "
+                android:text="• 홈 화면의 정보 카드가 중복되거나 비정상적으로 늘어나거나 쪼개졌을 때 사용합니다.\n• 현재 저장된 홈 정보 데이터를 기준으로 홈 화면의 체류 카드를 다시 구성합니다.\n• 일반적인 상황에는 사용할 필요가 없습니다.\n• 휴대폰 성능과 데이터의 크기에 따라 오래 걸릴 수 있습니다. "
                 android:textSize="13sp"
                 android:textColor="#555555"
                 android:lineSpacingExtra="4dp" />
