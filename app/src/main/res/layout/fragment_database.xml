@@ -228,7 +228,7 @@
                         android:textColor="#000000" />
                 </TableRow>
 
-                <!-- 3. 행정동 코드 -->
+                <!-- 3. 법정동 코드 -->
                 <TableRow android:paddingBottom="8dp">
                     <TextView
                         android:layout_width="wrap_content"
@@ -439,7 +439,7 @@
 
                 </TableRow>
 
-                <!-- 행정동 -->
+                <!-- 법정동 주소 -->
                 <TableRow android:paddingBottom="8dp">
 
                     <TextView
@@ -462,13 +462,13 @@
 
                 </TableRow>
 
-                <!-- 행정동 코드 -->
+                <!-- 법정동 코드 -->
                 <TableRow android:paddingBottom="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="• 행정동 코드"
+                        android:text="• 법정동 코드"
                         android:textStyle="bold"
                         android:textSize="13sp"
                         android:textColor="#333333"
