@@ -8,12 +8,12 @@ plugins {
 }
 
 android {
-    namespace = "com.example.haru_spot"
+    namespace = "com.haru.haru_stay"
 
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.haru_spot"
+        applicationId = "com.haru.haru_stay"
         minSdk = 31 //안드로이드 12이상만 구동
         targetSdk = 36
 
@@ -111,6 +111,9 @@ dependencies {
 ============================================================== */
 
 /* ========해야할일===================================================
+
+버스정류장 데이터 사전 탑재
+초기 설치 시 미리 준비한 버정 DB를 사용해 로딩 시간을 줄이고, 앱 업데이트 시 최신 데이터로 교체하도록 구현.
 
 위젯 개발
 즉시수집 =

@@ -21,7 +21,7 @@
         app:behavior_peekHeight="60dp"
         app:behavior_hideable="false"
         app:behavior_skipCollapsed="false"
-        app:layout_behavior="com.example.haru_spot.ui.fragment.testfragment.DragAreaBottomSheetBehavior">
+        app:layout_behavior="com.haru.haru_stay.ui.fragment.testfragment.DragAreaBottomSheetBehavior">
 
         <LinearLayout
             android:layout_width="match_parent"

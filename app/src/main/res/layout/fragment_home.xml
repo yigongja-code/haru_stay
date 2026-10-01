@@ -7,7 +7,7 @@
     tools:context=".ui.HomeFragment">
 
     <!-- 📌 화면 전체를 통째로 지배하는 일체형 줌인/줌아웃 타임라인 뷰 -->
-    <com.example.haru_spot.ui.view.HomeTimeAxisView
+    <com.haru.haru_stay.ui.view.HomeTimeAxisView
         android:id="@+id/homeTimeAxisView"
         android:layout_width="match_parent"
         android:layout_height="0dp"

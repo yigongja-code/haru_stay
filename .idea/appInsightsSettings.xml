@@ -9,8 +9,8 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.haru_spot" />
-                  <option name="mobileSdkAppId" value="1:1097648839930:android:7ebe560d3f49161b0d7d43" />
+                  <option name="appId" value="com.haru.haru_stay" />
+                  <option name="mobileSdkAppId" value="1:1097648839930:android:f08479c49114a0eb0d7d43" />
                   <option name="projectId" value="haru-stay" />
                   <option name="projectNumber" value="1097648839930" />
                 </ConnectionSetting>
