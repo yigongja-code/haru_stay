@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import com.haru.haru_stay.R
 import com.haru.haru_stay.service.ForegroundService
 import com.google.android.material.card.MaterialCardView
+import com.haru.haru_stay.service.유틸.AppSettings
 
 class fragment_collect : Fragment() {
 
@@ -35,6 +36,9 @@ class fragment_collect : Fragment() {
         // 2. 수집 주기 설정 및 WorkManager 연동 로직 초기화 (함수로 분리!)
         initCollectIntervalSettings(view)
 
+        // 3. 짧은 체류시간 설정 초기화
+        initShortSpotTimeSettings(view)
+
         return view
     }
 
@@ -53,14 +57,26 @@ class fragment_collect : Fragment() {
      * 이 영역을 함수로 깔끔하게 빼두었으니 다음 작업하실 때 혼선 없이 쾌적하게 하실 수 있습니다!
      */
     private fun initCollectIntervalSettings(view: View) {
-        val editInterval = view.findViewById<EditText>(R.id.edit_collect_interval)
-        val saveButton = view.findViewById<Button>(R.id.btn_save_interval)
+
+        val editInterval =
+            view.findViewById<EditText>(R.id.edit_collect_interval)
+
+        val saveButton =
+            view.findViewById<Button>(R.id.btn_save_interval)
+
+        // 저장된 수집 간격 불러오기
+        editInterval.setText(
+            AppSettings.getCollectInterval(requireContext()).toString()
+        )
 
         saveButton.setOnClickListener {
+
             val intervalStr = editInterval.text.toString().trim()
 
             // 확인 누를 때 키패드 숨기기 및 포커스 해제
-            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val imm = requireContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
             imm.hideSoftInputFromWindow(editInterval.windowToken, 0)
             editInterval.clearFocus()
 
@@ -79,6 +95,7 @@ class fragment_collect : Fragment() {
             if (intervalValue < 15) {
                 intervalValue = 15
                 editInterval.setText("15")
+
                 Toast.makeText(
                     requireContext(),
                     "최소 수집 간격은 15분 이상이어야 합니다. (15분으로 설정됨)",
@@ -86,14 +103,18 @@ class fragment_collect : Fragment() {
                 ).show()
             }
 
-            // 1. SharedPreferences에 변경된 수집 주기 저장
-            val sharedPreferences = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-            sharedPreferences.edit().putInt("collect_interval_minutes", intervalValue).apply()
+            // AppSettings에 수집 주기 저장
+            AppSettings.setCollectInterval(
+                requireContext(),
+                intervalValue
+            )
 
-            // 2. ForegroundService 호출을 통한 WorkManager 즉시 갱신 반영
-            val serviceIntent = Intent(requireContext(), ForegroundService::class.java).apply {
-                action = "ACTION_START"
-            }
+            // ForegroundService 호출을 통한 WorkManager 즉시 갱신 반영
+            val serviceIntent =
+                Intent(requireContext(), ForegroundService::class.java).apply {
+                    action = "ACTION_START"
+                }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 requireContext().startForegroundService(serviceIntent)
             } else {
@@ -103,6 +124,68 @@ class fragment_collect : Fragment() {
             Toast.makeText(
                 requireContext(),
                 "수집 간격이 ${intervalValue}분으로 설정 및 즉시 반영되었습니다.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+    /**
+     * 짧은 체류시간 설정
+     * 설정한 시간보다 짧은 Spot은 의미없는 체류로 판단하여 정리
+     */
+    private fun initShortSpotTimeSettings(view: View) {
+
+        val editShortSpotTime =
+            view.findViewById<EditText>(R.id.edit_short_spot_time)
+
+        val saveButton =
+            view.findViewById<Button>(R.id.btn_save_short_spot_time)
+
+        // 저장된 설정값 불러오기
+        val shortSpotMinutes =
+            AppSettings.getShortSpotTime(requireContext())
+
+        editShortSpotTime.setText(shortSpotMinutes.toString())
+
+        saveButton.setOnClickListener {
+
+            val input = editShortSpotTime.text.toString().trim()
+
+            // 키패드 숨기기 및 포커스 해제
+            val imm = requireContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+            imm.hideSoftInputFromWindow(editShortSpotTime.windowToken, 0)
+            editShortSpotTime.clearFocus()
+
+            if (input.isEmpty()) {
+                Toast.makeText(
+                    requireContext(),
+                    "체류시간을 입력해주세요!",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            val minutes = input.toIntOrNull()
+
+            if (minutes == null || minutes <= 0) {
+                Toast.makeText(
+                    requireContext(),
+                    "올바른 시간을 입력해주세요.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            // AppSettings에 짧은 체류시간 저장
+            AppSettings.setShortSpotTime(
+                requireContext(),
+                minutes
+            )
+
+            Toast.makeText(
+                requireContext(),
+                "짧은 체류시간이 ${minutes}분으로 설정되었습니다.",
                 Toast.LENGTH_SHORT
             ).show()
         }

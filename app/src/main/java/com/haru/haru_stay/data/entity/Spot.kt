@@ -18,6 +18,6 @@ data class Spot(
     val spStartTime: Long,      // 스팟 시작 시간 (Timestamp)
     var spEndTime: Long,        // 스팟 종료 시간 (Timestamp)
     val spSpotTime: Long,       // 스팟 체류 산정 시간
-    val spProcessedAt: Long,    // 가공 처리 완료 시점의 타임스탬프 (기존 불필요 필드 재정의)
+    val spProcessedAt: Long,    // 가공 처리 완료 시점의 타임스탬프 - 설정에서 받은 시간 이내는 삭제(체류시간이 적어 의미없는 스팟 삭제)
     val spMemoId: Long          // 연결된 메모 ID
 )

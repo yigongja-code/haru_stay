@@ -136,5 +136,89 @@
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+    <!-- [짧은 체류시간 설정 카드] -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:strokeWidth="2dp"
+        app:strokeColor="#2196F3"
+        app:cardBackgroundColor="#F8FBFF">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- 타이틀 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="◼ 짧은 체류시간 설정"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="16dp" />
+
+            <!-- 입력부 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end|center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <EditText
+                    android:id="@+id/edit_short_spot_time"
+                    android:layout_width="65dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="6dp"
+                    android:text=""
+                    android:inputType="number"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:text="분"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black" />
+
+                <Button
+                    android:id="@+id/btn_save_short_spot_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="확인"
+                    android:textSize="13sp"
+                    android:backgroundTint="#4A88BF"
+                    android:paddingHorizontal="14dp" />
+
+            </LinearLayout>
+
+            <!-- 구분선 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#D0E3F0"
+                android:layout_marginBottom="16dp" />
+
+            <!-- 상세 설명 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="• 설정한 시간보다 짧게 머문 장소는 의미없는 체류로 판단하여 기록에서 제외합니다.\n\n• 예를 들어 30분으로 설정하면 30분 미만의 짧은 체류 기록이 정리됩니다.\n\n• 마지막으로 수집된 장소는 다음 수집 데이터와 연결될 수 있으므로 이 기준과 관계없이 보존됩니다.\n"
+                android:textSize="13sp"
+                android:textColor="#555555"
+                android:lineSpacingExtra="4dp" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>

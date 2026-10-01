@@ -31,6 +31,7 @@ interface SpotDao {
     suspend fun insertT(spot: Spot)
     // 또는 insertSpot(spot: Spot)
 
+    //마지막 스팟 한개를 불러옴
     @Query("SELECT * FROM spot_db ORDER BY spEndTime DESC LIMIT 1")
     suspend fun getLastSpot(): Spot?
 
@@ -205,4 +206,31 @@ interface SpotDao {
     @Query("SELECT MIN(spStartTime) FROM spot_db")
     suspend fun getOldestSpotTime(): Long?
 
+    //입력받은 시간 이내의 스팟을 삭제 - 의미없는 시간의 스팟을 정리
+    @Query("""
+    DELETE FROM spot_db
+    WHERE spProcessedAt = 0
+      AND spSpotTime < :shortSpotLimitMillis
+      AND spId != (
+          SELECT spId
+          FROM spot_db
+          ORDER BY spEndTime DESC
+          LIMIT 1
+      )
+""")
+    suspend fun deleteShortUnprocessedSpots(shortSpotLimitMillis: Long)
+
+    //의미없는 스팟을 정리후 재가공하지 않기위해 현재시간을 마킹
+    @Query("""
+    UPDATE spot_db
+    SET spProcessedAt = :processedAt
+    WHERE spProcessedAt = 0
+      AND spId != (
+          SELECT spId
+          FROM spot_db
+          ORDER BY spEndTime DESC
+          LIMIT 1
+      )
+""")
+    suspend fun markSpotsProcessed(processedAt: Long)
 }

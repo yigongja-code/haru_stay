@@ -8,6 +8,7 @@ import com.haru.haru_stay.data.dao.SpotDao
 import com.haru.haru_stay.data.entity.Spot
 import com.haru.haru_stay.data.entity.VisitLog
 import com.haru.haru_stay.data.dao.MemoDao
+import com.haru.haru_stay.service.유틸.AppSettings
 
 
 class LogToSpotMaker(
@@ -29,8 +30,20 @@ class LogToSpotMaker(
             // 💡 간지 폭발하는 stage2Logs 변수명 채택!
             val stage2Logs = logDao.머지만가져오는2차가공용쿼리()
 
-            if (stage2Logs.size <= 1) {
-                Log.d(TAG, "😎 [Stage 2] 추가로 가공할 데이터가 없음")
+            val firstStartTime = stage2Logs.first().logStartTime
+            val lastEndTime = stage2Logs.last().logStartTime
+
+            Log.d(
+                TAG,
+                "⏱️ [Stage 2] firstStartTime=$firstStartTime / lastEndTime=$lastEndTime / " +
+                        "차이=${(lastEndTime - firstStartTime) / 60000}분"
+            )
+
+            if (lastEndTime - firstStartTime <= 10 * 60 * 1000L) {
+                Log.d(
+                    TAG,
+                    "⏸️ [Stage 2] 가공 대상 전체 시간이 10분 이내 → 이번 가공 보류"
+                )
                 return
             }
 
@@ -152,7 +165,19 @@ class LogToSpotMaker(
             e.printStackTrace()
         }
 
-        //초기화시 메모를 연결함
+            //설정에서 입력 받은 시간내의 스팟제거 로직
+            val shortSpotMinutes =
+                AppSettings.getShortSpotTime(context)
+
+            val shortSpotLimitMillis =
+                shortSpotMinutes * 60 * 1000L
+
+            //입력받은 시간 이내의 스팟을 삭제 - 의미없는 시간의 스팟을 정리
+            spotDao.deleteShortUnprocessedSpots(shortSpotLimitMillis)
+            //의미없는 스팟을 정리후 재가공하지 않기위해 현재시간을 마킹
+            spotDao.markSpotsProcessed(System.currentTimeMillis())
+
+            //초기화시 메모를 연결함
             // 8. 초기화 가공이었다면 Spot 생성 후 메모 복구
             if (memoStatus == 1) {
                 Log.d(TAG,"📝 초기화 가공 완료 → 메모 복구 시작")
@@ -208,7 +233,7 @@ class LogToSpotMaker(
             spStartTime = startTime,
             spEndTime = endTime,
             spSpotTime = endTime - startTime,
-            spProcessedAt = System.currentTimeMillis(),
+            spProcessedAt = 0L,             //짧은 시간의 스팟을 정리한 스탬프
             spMemoId = 0
         )
     }
@@ -270,9 +295,6 @@ class LogToSpotMaker(
                 spotDao.insertSpots(spotsToUpdate) // REPLACE 전략이므로 update 역할 수행
                 Log.d(TAG, "✨ [메모 단독 연동 완료] 총 ${spotsToUpdate.size}개의 스팟이 한 번에 일괄 업데이트되었습니다!")
             }
-
-
-
 
 
         } catch (e: Exception) {

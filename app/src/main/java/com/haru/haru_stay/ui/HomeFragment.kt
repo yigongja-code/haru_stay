@@ -123,16 +123,19 @@ class HomeFragment : Fragment() {
         binding.loadingProgressBar.visibility = View.VISIBLE
 
         // 2. 방아쇠 실행
-        // 가공이 끝난 뒤 뷰 DB가 갱신되므로 그때 화면을 다시 읽는다.
+// 가공이 끝난 뒤 뷰 DB가 갱신되므로 그때 화면을 다시 읽는다.
         TriggerLogToSpot.runIfNeeded(requireContext()) {
-            requireActivity().runOnUiThread {
-                // 가공 완료 후 화면 갱신
-                loadSpotsForSelectedDate()
-                // 로딩바 종료
 
-                binding.loadingProgressBar.visibility = View.GONE
-
+            // 가공이 끝나는 순간 Fragment가 이미 화면에서 분리되었을 수 있음
+            if (!isAdded || view == null) {
+                return@runIfNeeded
             }
+
+            // 가공 완료 후 화면 갱신
+            loadSpotsForSelectedDate()
+
+            // 로딩바 종료
+            binding.loadingProgressBar.visibility = View.GONE
         }
         /*
         // [케이스 B] 이미 가공이 끝났거나 돌고 있어서 새로 안 돌았을 때

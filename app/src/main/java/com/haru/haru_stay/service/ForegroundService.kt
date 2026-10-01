@@ -231,7 +231,7 @@ class ForegroundService : Service() {
         val savedMinutes =
             sharedPreferences.getInt(
                 "collect_interval_minutes",
-                10
+                15
             )
 
         val intervalMinutes =

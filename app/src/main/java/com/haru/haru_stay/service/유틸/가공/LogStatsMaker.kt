@@ -16,7 +16,7 @@ class LogStatsMaker(
 ) {
 
     companion object {
-        private const val TAG = "LogStatsMaker"
+        private const val TAG = "LogStatsMaker1"
 
         // =================================================
         //       폰이 꺼지거나 앱이 단절된 상황 조건
