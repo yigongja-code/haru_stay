@@ -54,8 +54,8 @@ class MoveFragment : Fragment(R.layout.fragment_move) {
     }
 
     //지도의 줌값
-    private var mapZoom = 13
-    private var previousMapZoom = 13
+    private var mapZoom = 11
+    private var previousMapZoom = 11
 
 
     private var currentMoveLogs = emptyList<VisitLog>()
@@ -637,16 +637,21 @@ class MoveFragment : Fragment(R.layout.fragment_move) {
                     firstLog.logGpsLon
                 )
 
+            map.moveCamera(CameraUpdateFactory.newCenterPosition(firstPosition))
+            // 초기 줌값 설정
             map.moveCamera(
-                CameraUpdateFactory.newCenterPosition(firstPosition)
+                CameraUpdateFactory.zoomTo(11)
             )
         }
 
         // 지도 확대/축소 정도
         //범위는 10~21  숫자가 적을수록 줌아웃 - 많이 바뀌니까 1씩 바꾸면서 확인
-        //map.moveCamera(
-        //    CameraUpdateFactory.zoomTo(13)
-        //)
+        /*
+        map.moveCamera(
+            CameraUpdateFactory.zoomTo(11)
+        )
+        */
+
 
         // ---------------------------------------------------------
         // 이동점 표시용 스타일
