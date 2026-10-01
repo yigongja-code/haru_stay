@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background1"
-    android:padding="16dp"
+    android:fillViewport="true"
     tools:context=".ui.settingfragment.fragment_data_management_setting">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
     <!-- 상단 '설정으로 돌아가기' 카드 박스 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/layout_back_to_setting"
@@ -87,6 +92,7 @@
                     android:layout_height="40dp"
                     android:text="저장"
                     android:textSize="13sp"
+                    android:textColor="@android:color/white"
                     android:backgroundTint="#4A88BF"
                     android:paddingHorizontal="14dp" />
 
@@ -99,9 +105,9 @@
                 android:layout_marginBottom="16dp" />
 
             <TextView
+                android:id="@+id/tv_data_storage_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="• 앱에 저장된 데이터를 파일로 저장합니다."
                 android:textSize="13sp"
                 android:textColor="#555555"
                 android:lineSpacingExtra="4dp" />
@@ -149,6 +155,7 @@
                     android:layout_height="40dp"
                     android:text="불러오기"
                     android:textSize="13sp"
+                    android:textColor="@android:color/white"
                     android:backgroundTint="#4A88BF"
                     android:paddingHorizontal="14dp" />
 
@@ -161,16 +168,15 @@
                 android:layout_marginBottom="16dp" />
 
             <TextView
+                android:id="@+id/tv_data_load_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="• 저장해 둔 데이터 파일을 앱으로 불러옵니다."
                 android:textSize="13sp"
                 android:textColor="#555555"
                 android:lineSpacingExtra="4dp" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-
 
     <!-- 데이터 초기화 -->
     <com.google.android.material.card.MaterialCardView
@@ -211,6 +217,7 @@
                     android:layout_height="40dp"
                     android:text="초기화"
                     android:textSize="13sp"
+                    android:textColor="@android:color/white"
                     android:backgroundTint="#4A88BF"
                     android:paddingHorizontal="14dp" />
 
@@ -223,14 +230,17 @@
                 android:layout_marginBottom="16dp" />
 
             <TextView
+                android:id="@+id/tv_data_reset_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="• 앱에 저장된 데이터를 모두 삭제하고 초기 상태로 되돌립니다."
                 android:textSize="13sp"
                 android:textColor="#555555"
                 android:lineSpacingExtra="4dp" />
 
         </LinearLayout>
+
     </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>
+
+</ScrollView>
