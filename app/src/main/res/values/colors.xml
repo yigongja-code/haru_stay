@@ -22,7 +22,8 @@
     <!-- ✨ 채도가 탁하지 않고 싼티 안 나는 감성 블루 컬러 팔레트 -->
     <color name="mute_blue_main">#4A6B82</color>     <!-- 고양이 케이스의 차분한 뮤트 블루 -->
     <color name="deep_navy">#1F2D3D</color>          <!-- 깊이감을 더해주는 딥 네이비 포인트 -->
-    E8F1FDd
+    <color name="warning_red">#D32F2F</color>       <!-- 빨강 -->
+
     <!--
         기본색상..
       E8F1FDd

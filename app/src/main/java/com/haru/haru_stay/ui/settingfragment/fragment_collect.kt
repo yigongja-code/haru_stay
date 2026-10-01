@@ -15,7 +15,13 @@ import androidx.fragment.app.Fragment
 import com.haru.haru_stay.R
 import com.haru.haru_stay.service.ForegroundService
 import com.google.android.material.card.MaterialCardView
+import com.haru.haru_stay.data.database.AppDatabase
 import com.haru.haru_stay.service.유틸.AppSettings
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
 
 class fragment_collect : Fragment() {
 
@@ -160,7 +166,7 @@ class fragment_collect : Fragment() {
             if (input.isEmpty()) {
                 Toast.makeText(
                     requireContext(),
-                    "체류시간을 입력해주세요!",
+                    "최소 체류시간을 입력해주세요!",
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
@@ -178,6 +184,7 @@ class fragment_collect : Fragment() {
             }
 
             // AppSettings에 짧은 체류시간 저장
+            // 설정값 저장
             AppSettings.setShortSpotTime(
                 requireContext(),
                 minutes
@@ -185,9 +192,24 @@ class fragment_collect : Fragment() {
 
             Toast.makeText(
                 requireContext(),
-                "짧은 체류시간이 ${minutes}분으로 설정되었습니다.",
+                "최소 체류시간이 ${minutes}분으로 설정되었습니다.",
                 Toast.LENGTH_SHORT
             ).show()
+
+            val db = AppDatabase.getDatabase(requireContext())
+
+            // 기존 Spot과 순위 데이터를 삭제하고
+            // 가공 상태를 로우데이터 상태로 되돌린다.
+            viewLifecycleOwner.lifecycleScope.launch {
+
+                withContext(Dispatchers.IO) {
+                    db.spotDao().deleteAllSpots()
+                    db.logDao().resetAllLogsToRaw()
+                    db.sumDao().전체SumDB삭제()
+                }
+            }
+
+
         }
     }
 }

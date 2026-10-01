@@ -90,6 +90,7 @@
                     android:layout_height="40dp"
                     android:text="재생성"
                     android:textSize="13sp"
+                    android:textColor="#D32F2F"
                     android:backgroundTint="#4A88BF"
                     android:paddingHorizontal="14dp" />
 
