@@ -638,7 +638,9 @@ class MoveFragment : Fragment(R.layout.fragment_move) {
                 )
 
             map.moveCamera(CameraUpdateFactory.newCenterPosition(firstPosition))
+
             // 초기 줌값 설정
+            // 다른곳에서 설정하면 줌값을 고정시켜서 이동시 따라 다님
             map.moveCamera(
                 CameraUpdateFactory.zoomTo(11)
             )
