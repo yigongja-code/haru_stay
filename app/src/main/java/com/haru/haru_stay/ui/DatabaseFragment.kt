@@ -79,6 +79,8 @@ class DatabaseFragment : Fragment() {
     private lateinit var tvSpEndTime: TextView
     private lateinit var tvSpSpotTime: TextView
     private lateinit var tvSpMemoId: TextView
+    private lateinit var  tvSpProcessedAt: TextView
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -157,6 +159,9 @@ class DatabaseFragment : Fragment() {
         tvSpEndTime = view.findViewById(R.id.tvSpEndTime)
         tvSpSpotTime = view.findViewById(R.id.tvSpSpotTime)
         tvSpMemoId = view.findViewById(R.id.tvSpMemoId)
+        tvSpProcessedAt = view.findViewById(R.id.tvSpProcessedAt)
+
+
 
         val btnSpotPrev = view.findViewById<Button>(R.id.t_sp_button_prev)
         val btnSpotNext = view.findViewById<Button>(R.id.t_sp_button_next)
@@ -588,6 +593,7 @@ class DatabaseFragment : Fragment() {
                     tvSpEndTime.text = ""
                     tvSpSpotTime.text = ""
                     tvSpMemoId.text = ""
+                    tvSpProcessedAt.text = ""
                 }
 
             } catch (e: Exception) {
@@ -1031,6 +1037,18 @@ class DatabaseFragment : Fragment() {
         // -----------------------------------------
         tvSpMemoId.text =
             spot.spMemoId.toString()
+
+        // -----------------------------------------
+        // 가공 처리 시간
+        // -----------------------------------------
+        tvSpProcessedAt.text =
+            if (spot.spProcessedAt == 0L) {
+                "0"
+            } else {
+                dateFormat.format(
+                    java.util.Date(spot.spProcessedAt)
+                )
+            }
     }
 
     //spot 날짜 이동 함수
