@@ -116,7 +116,35 @@ class fragment_data_management_setting : Fragment() {
             view.findViewById<Button>(R.id.btn_data_load)
 
         loadButton.setOnClickListener {
-            // 기존 데이터 불러오기 로직
+
+            AlertDialog.Builder(
+                requireContext(),
+                R.style.CustomAlertDialogStyle
+            )
+                .setTitle("데이터 불러오기")
+                .setMessage(
+                    "기존 데이터를 모두 비우고 선택한 백업 파일의 데이터로 " +
+                            "덮어씌우시겠습니까?\n\n" +
+                            "다운로드 폴더의 Haru_Database.json을 선택하면 됩니다."
+                )
+                .setPositiveButton("예") { _, _ ->
+
+                    val intent =
+                        Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                            addCategory(Intent.CATEGORY_OPENABLE)
+                            type = "application/json"
+
+                            // 파일 탐색기에서 'haru' 검색을 유도
+                            putExtra(Intent.EXTRA_TITLE, "haru")
+                        }
+
+                    startActivityForResult(
+                        intent,
+                        REQUEST_CODE_LOAD_DATA
+                    )
+                }
+                .setNegativeButton("아니오", null)
+                .show()
         }
 
 
