@@ -793,7 +793,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //테스트프레그먼트에 비밀번호 1234 등록
-    private fun showDeveloperAuthDialog() {
+    /*private fun showDeveloperAuthDialog() {
 
         val input = EditText(this).apply {
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or
@@ -815,39 +815,8 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        /*AlertDialog.Builder(this, R.style.CustomAlertDialogStyle)
-            .setTitle("개발자 메뉴")
-            .setMessage("개발자 메뉴입니다.\n비밀번호를 입력하세요.")
-            .setView(container)
-            .setNegativeButton("취소", null)
-            .setPositiveButton("확인", null)
-            .create()
-            .apply {
 
-                setOnShowListener {
-
-                    getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-
-                        if (input.text.toString() == "1236") {
-
-                            DeveloperMode.unlocked = true
-
-                            dismiss()
-
-                            // 테스트 메뉴 다시 선택
-                            binding.bottomNavigation.selectedItemId = R.id.nav_test
-
-                        } else {
-
-                            input.error = "비밀번호가 올바르지 않습니다."
-                            input.requestFocus()
-                        }
-                    }
-                }
-
-                show()
-            }*/
-    }
+    }*/
 
     private fun checkUpdateSheet() {
 

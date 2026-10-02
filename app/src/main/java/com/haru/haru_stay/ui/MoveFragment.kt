@@ -659,7 +659,7 @@ class MoveFragment : Fragment(R.layout.fragment_move) {
         // 이동점 표시용 스타일
         // ---------------------------------------------------------
 
-        val styles =
+        /*val styles =
             map.labelManager?.addLabelStyles(
                 LabelStyles.from(
                     LabelStyle.from()
@@ -668,11 +668,12 @@ class MoveFragment : Fragment(R.layout.fragment_move) {
                             android.graphics.Color.BLACK
                         )
                 )
-            ) ?: return
+            ) ?: return*/
 
         // ---------------------------------------------------------
         // 최종 이동점을 지도에 표시
         // ---------------------------------------------------------
+
 
         for (log in logs) {
 
@@ -682,13 +683,34 @@ class MoveFragment : Fragment(R.layout.fragment_move) {
                     log.logGpsLon
                 )
 
+            val isFavorite =
+                log.logBusStop.startsWith("⭐")
+
+            val markerText =
+                if (isFavorite) "★" else "●"
+
+            // 별과 원의 크기
+            val markerSize =
+                if (isFavorite) 25 else 16
+
+            val styles =
+                map.labelManager?.addLabelStyles(
+                    LabelStyles.from(
+                        LabelStyle.from()
+                            .setTextStyles(
+                                markerSize,
+                                android.graphics.Color.BLACK
+                            )
+                    )
+                ) ?: continue
+
             val options =
                 LabelOptions
                     .from(position)
                     .setStyles(styles)
                     .setTexts(
                         LabelTextBuilder()
-                            .setTexts("●")
+                            .setTexts(markerText)
                     )
 
             layer.addLabel(options)
