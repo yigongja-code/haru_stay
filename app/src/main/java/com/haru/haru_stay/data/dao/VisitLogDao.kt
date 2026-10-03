@@ -129,6 +129,21 @@ interface LogDao {
         endTime: Long
     ): List<VisitLog>
 
+    // 이동경로용 logDB 조회 - 압축된 3차 가공 log파일
+    // 3차 압축에서 cmpignored 된 로그는 화면 표시에서 제외
+    @Query("""
+    SELECT *
+    FROM log_db
+    WHERE logStartTime >= :startTime
+      AND logStartTime < :endTime
+      AND logField2 != 'cmpignored'
+    ORDER BY logStartTime ASC
+""")
+    suspend fun getMoveLogsByStartTime(
+        startTime: Long,
+        endTime: Long
+    ): List<VisitLog>
+
     // 3차 압축 대상 로그 조회용 쿼리
 
      @Query("""

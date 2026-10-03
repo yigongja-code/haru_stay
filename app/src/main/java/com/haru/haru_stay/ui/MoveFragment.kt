@@ -496,7 +496,7 @@ class MoveFragment : Fragment(R.layout.fragment_move) {
                     AppDatabase.getDatabase(requireContext())
 
                 val logs =
-                    db.logDao().getLogsByStartTime(
+                    db.logDao().getMoveLogsByStartTime(
                         startTime = startTime,
                         endTime = endTime
                     )
@@ -543,13 +543,20 @@ class MoveFragment : Fragment(R.layout.fragment_move) {
         // 두 번째 로그부터 비교
         for (log in logs.drop(1)) {
 
+            // 즐겨찾기 로그는 거리 필터를 통과시킨다.
+            if (log.logBusStop.startsWith("⭐")) {
+                result.add(log)
+                referenceLog = log
+                continue
+            }
+
             val distance =
                 distanceBetween(
                     referenceLog,
                     log
                 )
 
-            // 20m를 초과하면 새로운 이동점
+            // 저장한 기준점을  초과하면 새로운 이동점 : 가까운 이동점의 중복을 제거함
             if (distance > MAP_MOVE_DISTANCE) {
 
                 result.add(log)
