@@ -73,7 +73,8 @@ interface LogDao {
         UPDATE log_db 
         SET logEndTime = 0, 
             logStats = 'pending', 
-            logProcessedAt = 0 
+            logProcessedAt = 0,
+            logField2 = 'cmppending'
         WHERE logStats != 'pending'
     """)
     suspend fun resetAllLogsToRaw()
@@ -127,5 +128,15 @@ interface LogDao {
         startTime: Long,
         endTime: Long
     ): List<VisitLog>
+
+    // 3차 압축 대상 로그 조회용 쿼리
+
+     @Query("""
+          SELECT *
+          FROM log_db
+          WHERE logField2 IN ('cmppending', 'cmpconnect')
+          ORDER BY logStartTime ASC
+     """)
+     suspend fun getLogsForCompression(): List<VisitLog>
 
 }

@@ -69,6 +69,8 @@ class DatabaseFragment : Fragment() {
 
     private lateinit var tvTableTitle: TextView //수집데이터 타이틀 아이디
 
+    private lateinit var tvField2: TextView //가공3 로그 상태메시지
+
     private val REQUEST_CODE_LOAD_DATA = 9999
 
     //spotDB용 변수 선언
@@ -138,6 +140,8 @@ class DatabaseFragment : Fragment() {
         tvGpsRange = view.findViewById<TextView>(R.id.tvGpsRange)           // 9. 와이파이오차값
         tvBusDistance = view.findViewById<TextView>(R.id.tvBusDistance)           // 9. 기준점거리
         tvAdmName = view.findViewById<TextView>(R.id.tvAdmName)           // 주소
+        tvField2 = view.findViewById<TextView>(R.id.tvField2)             // 11. 3차 가공 상태
+
         tvTableTitle = view.findViewById<TextView>(R.id.tvTableTitle)
 
 
@@ -421,7 +425,7 @@ class DatabaseFragment : Fragment() {
 
                         displayLogData(
                             currentIndex, tvPageInfo, tvStartTime, tvEndTime, tvBusStop, tvAdmCode,
-                            tvLocation, tvCellTower, tvWifi, tvStatus, tvGeofencing, tvGpsRange, tvBusDistance, tvAdmName, logList
+                            tvLocation, tvCellTower, tvWifi, tvStatus, tvGeofencing, tvGpsRange, tvBusDistance, tvAdmName, tvField2, logList
                         )
                     } else {
                         currentIndex = 0
@@ -452,7 +456,7 @@ class DatabaseFragment : Fragment() {
                 currentIndex++
                 displayLogData(
                     currentIndex, tvPageInfo, tvStartTime, tvEndTime, tvBusStop, tvAdmCode,
-                    tvLocation, tvCellTower, tvWifi, tvStatus, tvGeofencing, tvGpsRange, tvBusDistance, tvAdmName,logList
+                    tvLocation, tvCellTower, tvWifi, tvStatus, tvGeofencing, tvGpsRange, tvBusDistance, tvAdmName,tvField2, logList
                 )
             } else {
                 Toast.makeText(requireContext(), "마지막 기록입니다.", Toast.LENGTH_SHORT).show()
@@ -466,7 +470,7 @@ class DatabaseFragment : Fragment() {
                 currentIndex--
                 displayLogData(
                     currentIndex, tvPageInfo, tvStartTime, tvEndTime, tvBusStop, tvAdmCode,
-                    tvLocation, tvCellTower, tvWifi, tvStatus, tvGeofencing, tvGpsRange, tvBusDistance,tvAdmName, logList
+                    tvLocation, tvCellTower, tvWifi, tvStatus, tvGeofencing, tvGpsRange, tvBusDistance, tvAdmName,tvField2, logList
                 )
             } else {
                 firstRecordClickCount++
@@ -723,6 +727,7 @@ class DatabaseFragment : Fragment() {
         tvGpsRange: TextView, // 💡 파라미터명 변경
         tvBusDistance: TextView,
         tvAdmName : TextView,
+        tvField2: TextView,
         list: List<VisitLog>
     ) {
         if (list.isEmpty() || index !in list.indices) return
@@ -782,6 +787,9 @@ class DatabaseFragment : Fragment() {
         // 7. 상태
         tvStatus.text = log.logStats.ifBlank { "" }
 
+        // 7-1. 3차 가공 상태
+        tvField2.text = log.logField2.ifBlank { "" }
+
         // 8. 가공후 상태메시지
         // 8. 가공후 상태메시지 (밀리초 타임스탬프를 보기 편한 날짜/시간으로 변환!)
         tvGeofencing.text = if (log.logProcessedAt != 0L) {
@@ -816,7 +824,7 @@ class DatabaseFragment : Fragment() {
             currentIndex = targetIndex
             displayLogData(
                 currentIndex, tvPageInfo, tvStartTime, tvEndTime, tvBusStop, tvAdmCode,
-                tvLocation, tvCellTower, tvWifi, tvStatus, tvGeofencing, tvGpsRange, tvBusDistance, tvAdmName,logList
+                tvLocation, tvCellTower, tvWifi, tvStatus, tvGeofencing, tvGpsRange, tvBusDistance, tvAdmName,tvStatus, logList
             )
             Toast.makeText(requireContext(), "$targetDate 기록으로 이동했습니다.", Toast.LENGTH_SHORT).show()
         } else {

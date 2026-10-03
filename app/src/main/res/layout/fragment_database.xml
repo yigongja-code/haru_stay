@@ -304,6 +304,25 @@
                         android:textColor="#000000" />
                 </TableRow>
 
+                <!-- 7. 상태 -->
+                <TableRow android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• 압축상태"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:paddingRight="16dp" />
+                    <TextView
+                        android:id="@+id/tvField2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:textSize="13sp"
+                        android:textColor="#000000" />
+                </TableRow>
+
                 <!-- 🗺️ 카카오맵 버튼과 데이터 삭제 버튼을 1:1 비율로 나란히 배치 -->
                 <LinearLayout
                     android:id="@+id/layoutActionButtons"

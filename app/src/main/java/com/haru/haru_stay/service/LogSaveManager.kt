@@ -36,7 +36,7 @@ class LogSaveManager(
             logProcessedAt = 0L,
             logMemoId = 0L,
             logBusDistance = admResult?.busDistance?: 0L,
-            logField2 = "",       // 예비2 기본값
+            logField2 = "cmppending",       // log압축용 상태값 cmppending cmpfirst cmpignored cmplast
             logField3 = "",       // 예비3 기본값
             logField4 = ""        // 예비4 기본값
         )

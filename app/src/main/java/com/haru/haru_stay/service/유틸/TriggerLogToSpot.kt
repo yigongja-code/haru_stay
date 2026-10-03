@@ -5,11 +5,13 @@ import android.util.Log
 import com.haru.haru_stay.data.database.AppDatabase
 import com.haru.haru_stay.service.유틸.가공.LogStatsMaker
 import com.haru.haru_stay.service.유틸.가공.LogToSpotMaker
+import com.haru.haru_stay.service.유틸.가공.LogCompression
 import com.haru.haru_stay.util.SumUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
+
 
 object TriggerLogToSpot {
     //  import com.example.haru_spot.service.engine.TriggerLogToSpot
@@ -107,6 +109,21 @@ object TriggerLogToSpot {
 
                 SumUtil.calculateSum(appContext)
                 Log.e(TAG, "📊 [3단계 완료] 통계 가공 끝!")
+
+                // ------------------------------------------------
+                // 3단계. 로그 3차 압축
+                // ------------------------------------------------
+
+                Log.e(TAG, "🗜️ [3단계] 로그 3차 압축 시작")
+
+
+
+                val logCompression = LogCompression(
+                    context = appContext
+                )
+
+                logCompression.compressLogs()
+                Log.e(TAG, "🗜️ [3단계 완료] 로그 3차 압축 끝!")
 
 
 

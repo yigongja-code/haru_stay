@@ -41,7 +41,7 @@ object TestDataCollector {
 
         // 3. 시작 시간 설정 (예: 5일 전)
         val startCalendar = Calendar.getInstance().apply {
-            add(Calendar.DAY_OF_YEAR, -100)  // 뒤에 숫자가 데이터 생성일
+            add(Calendar.DAY_OF_YEAR, -30)  // 뒤에 숫자가 데이터 생성일
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
@@ -124,7 +124,9 @@ object TestDataCollector {
                 logProcessedAt = 0L,
                 logMemoId = 0L,
                 logBusDistance = admResult.busDistance,
-                logField2 = "", logField3 = "", logField4 = ""
+                logField2 = "cmppending",
+                logField3 = "",
+                logField4 = ""
 
             )
 
