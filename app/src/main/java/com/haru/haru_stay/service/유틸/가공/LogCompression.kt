@@ -64,7 +64,7 @@ class LogCompression(
             return result
         }
 
-// 변경된 로그만 마지막에 한 번 저장하기 위한 목록
+        // 변경된 로그만 마지막에 한 번 저장하기 위한 목록
         val changedLogs = linkedMapOf<Long, VisitLog>()
 
         fun setState(index: Int, state: String) {
@@ -97,30 +97,32 @@ class LogCompression(
 
             val next = result[i + 1]
 
-            // =====================================================
-            // 현재 로그가 즐겨찾기가 아닐때
-            // =====================================================
-            if (!current.logBusStop.startsWith("⭐")) {
-                setState(i, "cmpnone")
-                /*Log.e(
+            //앞단 가드는 가공되지 않은 cmppending만 검사함
+            if (current.logField2 == "cmppending") {
+              // =====================================================
+              // 현재 로그가 즐겨찾기가 아닐때
+              // =====================================================
+              if (!current.logBusStop.startsWith("⭐")) {
+                  setState(i, "cmpnone")
+                  /*Log.e(
                     TAG,
                     "❌ 즐겨찾기 가드 컷: id=${current.logId}, busStop=${current.logBusStop}"
-                )*/
-                continue
-            }
+                    )*/
+                  continue
+              }
 
-            // =====================================================
-            // 즐겨찾기 로그지만 Wi-Fi가 없으면 압축하지 않는다.
-            // =====================================================
-            if (current.logWifiMac.isNullOrEmpty()) {
-                setState(i, "cmpnone")
-                Log.e(
-                    TAG,
-                    "❌ 즐겨찾기 가드 와이파이 컷: id=${current.logId}, busStop=${current.logBusStop}"
-                )
-                continue
+              // =====================================================
+              // 즐겨찾기 로그지만 Wi-Fi가 없으면 압축하지 않는다.
+              // =====================================================
+              if (current.logWifiMac.isNullOrEmpty()) {
+                  setState(i, "cmpnone")
+                  //Log.e(
+                  //    TAG,
+                  //    "❌ 즐겨찾기 가드 와이파이 컷: id=${current.logId}, busStop=${current.logBusStop}"
+                  //)
+                  continue
+              }
             }
-
             when (current.logField2) {
 
                 // =================================================
@@ -171,10 +173,10 @@ class LogCompression(
 
                         continue
                     }
-                    Log.e(
-                        TAG,
-                        "❌ 즐겨찾기 if끝  컷: id=${current.logId}, busStop=${current.logBusStop}"
-                    )
+                    //Log.e(
+                    //    TAG,
+                    //    "❌ 즐겨찾기 if끝  컷: id=${current.logId}, busStop=${current.logBusStop}"
+                    //)
                     // 압축 시작 조건 불충족
                     setState(i, "cmpnone")
 

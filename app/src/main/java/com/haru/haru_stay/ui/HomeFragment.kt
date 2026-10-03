@@ -676,6 +676,39 @@ class HomeFragment : Fragment() {
 
                 for (log in rawLogs) {
 
+                    // ⭐ 즐겨찾기 로그는 중복 묶음에 넣지 않고
+                    // 현재 bucket을 먼저 확정한 뒤 독립된 항목으로 표시한다.
+                    if (log.logBusStop?.startsWith("⭐") == true) {
+
+                        // 기존 bucket 처리
+                        if (bucket.isNotEmpty()) {
+
+                            val displayLog = bucket.getOrNull(1) ?: bucket.first()
+
+                            displayLogs.add(
+                                DisplayRoute(
+                                    log = displayLog,
+                                    duplicateCount = bucket.size,
+                                    endTime = bucket.last().logStartTime
+                                )
+                            )
+                        }
+
+                        // ⭐ 즐겨찾기는 항상 단독 표시
+                        displayLogs.add(
+                            DisplayRoute(
+                                log = log,
+                                duplicateCount = 1,
+                                endTime = log.logStartTime
+                            )
+                        )
+
+                        // 새로운 bucket 시작
+                        bucket = mutableListOf()
+
+                        continue
+                    }
+
                     if (bucket.isEmpty()) {
                         bucket.add(log)
                         continue
@@ -690,8 +723,8 @@ class HomeFragment : Fragment() {
                             bucket.add(log)
                             continue
                         }
-                        // 여기서 몇m로 바꿀건지를 설정   50L = 50미터 20L = 20미터
-                        // 테스트가 애매하면 설정으로 빼면됨
+
+                        // 같은 버정 + 거리 20m 이내면 중복으로 묶음
                         if (kotlin.math.abs(log.logBusDistance - referenceDistance) <= 20L) {
                             bucket.add(log)
                             continue
@@ -1073,7 +1106,8 @@ class HomeFragment : Fragment() {
                 // ③ rawLogs는 기존 그대로   //spot의 시작과 끝시간 안에 있는 로그를 넣음
                 // =========================================================
                 val rawLogs = withContext(Dispatchers.IO) {
-                    logDao.getLogsBetween(
+                    //압축된 로그 데이터를 불러옴 cmpignored
+                    logDao.getLogsBetweenForPopup(
                         startTimestamp,
                         endTimestamp
 
