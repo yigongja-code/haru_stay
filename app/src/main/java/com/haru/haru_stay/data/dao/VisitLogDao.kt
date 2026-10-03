@@ -79,10 +79,21 @@ interface LogDao {
     """)
     suspend fun resetAllLogsToRaw()
 
-    //2층 확대 박스에 버스정류장등을 리스트화해서 뿌려줄 쿼리
-    //spotdb의 시작시간과 종료시간을 받아와서 logdb의 시작시간  종료시간안의 값음 모두 가져옴
-    @Query("SELECT * FROM log_db WHERE logStartTime >= :startTimestamp AND logEndTime <= :endTimestamp AND logEndTime >= 0 ORDER BY logStartTime ASC")
-    suspend fun getLogsBetween(startTimestamp: Long, endTimestamp: Long): List<VisitLog>
+
+    // 팝업 리스트용 logDB 조회
+    // 3차 압축에서 무시된 로그는 제외
+    @Query("""
+    SELECT *
+    FROM log_db
+    WHERE logStartTime >= :startTimestamp
+      AND logStartTime < :endTimestamp
+      AND logField2 != 'cmpignored'
+    ORDER BY logStartTime ASC
+""")
+    suspend fun getLogsBetweenForPopup(
+        startTimestamp: Long,
+        endTimestamp: Long
+    ): List<VisitLog>
     //10분 정규화로 이전dao주석
     /*@Query("""
     SELECT * FROM log_db

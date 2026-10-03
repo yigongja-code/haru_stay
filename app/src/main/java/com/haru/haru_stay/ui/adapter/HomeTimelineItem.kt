@@ -64,49 +64,135 @@ data class HomeTimelineItem(
     )
 
 //화면에 개별 박스에 버스정류장을 띄울 정보 수집
-private fun 많이등장한버정찾기(logs: List<VisitLog>): String? {
+/**
+ * 스팟 안에서 대표 정류장을 찾습니다.
+ *
+ * 기본 로그는 1개당 1hit로 계산합니다.
+ *
+ * 3차 압축 로그는 다음 규칙으로 계산합니다.
+ *
+ * cmpfirst
+ * → 첫 로그이므로 1hit를 먼저 추가
+ * → 시작 시간을 저장
+ *
+ * cmplast
+ * → cmpfirst ~ cmplast 전체 시간을 계산
+ * → 15분을 1hit로 보고 추가 hit를 계산
+ * → 이미 cmpfirst에서 1hit를 넣었으므로 마지막 계산에서는 -1
+ *
+ * 예:
+ * cmpfirst  10:00
+ * cmplast   11:00
+ *
+ * 60분 / 15분 = 4hit
+ * 이미 cmpfirst에서 1hit를 추가했으므로
+ * 추가 3hit를 더합니다.
+ *
+ * 빈값, 알 수 없음, disconnect 등은 대표 정류장에서 제외합니다.
+ */
+private fun 많이등장한버정찾기(
+    logs: List<VisitLog>
+): String? {
+
+    // 정류장별 hit 수
+    // LinkedHashMap을 사용하여 처음 등장한 순서를 유지합니다.
     val busStopCounts = linkedMapOf<String, Int>()
 
-    android.util.Log.e(
-        "BUS_STOP_DEBUG-12",
-        "🚌 많이등장한버정찾기() 받은 logs=${logs.size}개"
-    )
+    // 3차 압축의 cmpfirst 시작 시간
+    var cmpStartTime = 0L
 
+    // 현재 압축 중인 즐겨찾기 정류장 이름
+    var cmpBusStop: String? = null
 
+    // ------------------------------------------------
+    // 로그를 한 번만 순회
+    // ------------------------------------------------
     for (log in logs) {
 
-        android.util.Log.e(
-            "BUS_STOP_DEBUG-12",
-            "   ↳ logId=${log.logId} / " +
-                    "AdmCode=${log.logAdmCode} / " +
-                    "시작=${log.logStartTime} / " +
-                    "종료=${log.logEndTime} / " +
-                    "버정=${log.logBusStop}"
-        )
         val busStop = log.logBusStop?.trim().orEmpty()
 
         // 대표 정류장 후보에서 의미 없는 값은 제외
-        val isInvalidBusStop = busStop.isBlank() ||
-                busStop == "알 수 없음" ||
-                busStop.startsWith("[⚠️disconnect]")
+        val isInvalidBusStop =
+            busStop.isBlank() ||
+                    busStop == "알 수 없음" ||
+                    busStop == "지정되지 않은 장소" ||
+                    busStop.startsWith("[⚠️disconnect]")
 
         if (isInvalidBusStop) {
             continue
         }
 
-        // 처음 나온 순서가 유지되도록 LinkedHashMap 사용
-        busStopCounts[busStop] =
-            (busStopCounts[busStop] ?: 0) + 1
+        // ------------------------------------------------
+        // 3차 압축 시작
+        // ------------------------------------------------
+        if (log.logField2 == "cmpfirst") {
+
+            // 즐겨찾기 이름
+            val pureBusStop = busStop
+                .removePrefix("⭐")
+                .trim()
+
+            // cmpfirst 자체를 1hit로 계산
+            busStopCounts[pureBusStop] =
+                (busStopCounts[pureBusStop] ?: 0) + 1
+
+            // 압축 시작 정보 저장
+            cmpStartTime = log.logStartTime
+            cmpBusStop = pureBusStop
+
+            continue
+        }
+
+        // ------------------------------------------------
+        // 3차 압축 종료
+        // ------------------------------------------------
+        if (log.logField2 == "cmplast" && cmpBusStop != null) {
+
+            // cmpfirst에서 이미 1hit를 계산했으므로
+            // 전체 압축 시간에서 추가 hit만 계산합니다.
+            val compressedHit =
+                ((log.logEndTime - cmpStartTime) /
+                        (15L * 60L * 1000L))
+                    .toInt() - 1
+
+            if (compressedHit > 0) {
+                busStopCounts[cmpBusStop!!] =
+                    (busStopCounts[cmpBusStop!!] ?: 0) + compressedHit
+            }
+
+            // 압축 상태 초기화
+            cmpStartTime = 0L
+            cmpBusStop = null
+
+            continue
+        }
+
+        // ------------------------------------------------
+        // 일반 로그
+        // ------------------------------------------------
+        // 별표가 붙은 경우에도 실제 정류장 이름만 기준으로 집계합니다.
+        val pureBusStop = busStop
+            .removePrefix("⭐")
+            .trim()
+
+        busStopCounts[pureBusStop] =
+            (busStopCounts[pureBusStop] ?: 0) + 1
     }
 
+    // 후보가 하나도 없으면 대표 정류장 없음
     if (busStopCounts.isEmpty()) {
         return null
     }
 
-    val representative = busStopCounts.maxByOrNull { it.value }
+    // hit 수가 가장 많은 정류장을 대표값으로 선택
+    val representative =
+        busStopCounts.maxByOrNull { it.value }
 
-    // 모든 정류장이 1번씩만 등장하면 대표값 없음
-    return if (representative != null && representative.value >= 2) {
+    // 1hit짜리 후보만 있다면 대표값으로 사용하지 않음
+    return if (
+        representative != null &&
+        representative.value >= 2
+    ) {
         representative.key
     } else {
         null
@@ -176,7 +262,9 @@ fun extractPopupBusItems(logs: List<com.haru.haru_stay.data.entity.VisitLog>): L
                 latitude = log.logGpsLat,
                 longitude = log.logGpsLon,
                 busAdmCode = log.logAdmCode,
-                busAdmName = log.logAdmName
+                busAdmName = log.logAdmName,
+                cellKey = log.logCellKey,
+                wifiMac = log.logWifiMac
             )
         )
 
