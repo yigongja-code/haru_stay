@@ -22,6 +22,8 @@ import com.haru.haru_stay.data.entity.Fav
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.haru.haru_stay.service.collector.CellIdCollector
+import com.haru.haru_stay.service.collector.WifiCollector
 
 
 object UserLocationInputHelper {
@@ -37,6 +39,8 @@ object UserLocationInputHelper {
             val loc = collector.fetchBestLocation()
             val lat = loc?.latitude ?: 0.0
             val lon = loc?.longitude ?: 0.0
+            val cellData = com.haru.haru_stay.service.collector.CellIdCollector(context).fetchCellId()
+            val wifiData = com.haru.haru_stay.service.collector.WifiCollector(context).fetchConnectedWifi()
 
             // ============================================================
             // 2. 주소와 코드 수집
@@ -237,8 +241,8 @@ object UserLocationInputHelper {
                             favAdmCode = admCode,
                             favAdmName = admCodeNm,
                             favBusStop = locationName,
-                            favCellKey = "",
-                            favWifiMac = "",
+                            favCellKey = cellData ?: "",
+                            favWifiMac = wifiData ?: "",
                             favGpsLat = lat,
                             favGpsLon = lon,
                             favInDate = System.currentTimeMillis(),

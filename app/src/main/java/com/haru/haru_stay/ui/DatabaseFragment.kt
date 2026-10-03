@@ -889,6 +889,8 @@ class DatabaseFragment : Fragment() {
         val lon = selected.logGpsLon
         val admCode = selected.logAdmCode
         val admCodeNm = selected.logAdmName
+        val cellKey = selected.logCellKey
+        val wifiMac = selected.logWifiMac
 
         try {
             val db = AppDatabase.getDatabase(context)
@@ -913,8 +915,8 @@ class DatabaseFragment : Fragment() {
                 favAdmCode = admCode,
                 favAdmName = admCodeNm,
                 favBusStop = locationName,
-                favCellKey = "",
-                favWifiMac = "",
+                favCellKey = cellKey,
+                favWifiMac = wifiMac,
                 favGpsLat = lat,
                 favGpsLon = lon,
                 favInDate = System.currentTimeMillis(),

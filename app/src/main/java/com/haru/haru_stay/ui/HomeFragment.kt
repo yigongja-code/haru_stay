@@ -482,7 +482,7 @@ class HomeFragment : Fragment() {
                 }
 
                 android.app.AlertDialog.Builder(requireContext(),R.style.CustomAlertDialogStyle)
-                    .setTitle("위치 등록")
+                    .setTitle("즐겨찾기 등록")
                     .setMessage("등록할 위치의 이름을 입력해주세요.")
                     .setView(editText)
                     .setNegativeButton("취소", null)
@@ -800,8 +800,9 @@ class HomeFragment : Fragment() {
                             latitude = log.logGpsLat,
                             longitude = log.logGpsLon,
                             busAdmCode = log.logAdmCode,
-                            busAdmName = log.logAdmName
-
+                            busAdmName = log.logAdmName,
+                            cellKey = log.logCellKey,
+                            wifiMac = log.logWifiMac
                         )
 
 
@@ -1122,6 +1123,8 @@ class HomeFragment : Fragment() {
         val lon = selected.longitude
         val admCode = selected.busAdmCode
         val admCodeNm = selected.busAdmName
+        val cellKey = selected.cellKey
+        val wifiMac = selected.wifiMac
 
         try {
             val db = AppDatabase.getDatabase(context)
@@ -1146,8 +1149,8 @@ class HomeFragment : Fragment() {
                 favAdmCode = admCode,
                 favAdmName = admCodeNm,
                 favBusStop = locationName,
-                favCellKey = "",
-                favWifiMac = "",
+                favCellKey = cellKey,
+                favWifiMac = wifiMac,
                 favGpsLat = lat,
                 favGpsLon = lon,
                 favInDate = System.currentTimeMillis(),

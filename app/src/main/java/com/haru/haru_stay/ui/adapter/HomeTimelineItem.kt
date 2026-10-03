@@ -53,13 +53,15 @@ data class HomeTimelineItem(
 
 
     //2층뷰 데이터 클래스
-data class PopupBusItem(
-    val displayText: String, // "오전 07:30 - 강남역 인근"
-    val latitude: Double,    // logGpsLat (개별 좌표)
-    val longitude: Double,    // logGpsLon (개별 좌표)
-    val busAdmCode: String = "",    // logAdmCode
-    val busAdmName: String = ""// logAdmName
-)
+    data class PopupBusItem(
+        val displayText: String, // "오전 07:30 - 강남역 인근"
+        val latitude: Double,    // logGpsLat
+        val longitude: Double,   // logGpsLon
+        val busAdmCode: String = "",    // logAdmCode
+        val busAdmName: String = "",    // logAdmName
+        val cellKey: String = "",       // logCellKey
+        val wifiMac: String = ""        // logWifiMac
+    )
 
 //화면에 개별 박스에 버스정류장을 띄울 정보 수집
 private fun 많이등장한버정찾기(logs: List<VisitLog>): String? {
