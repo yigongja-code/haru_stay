@@ -61,7 +61,7 @@ class LogCompression(
         val result = logs.toMutableList()
 
         // 압축 대상 로그가 없으면 종료
-        if (result.size <= 4) {
+        if (result.size <= 2) {
             return result
         }
 
