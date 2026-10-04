@@ -42,6 +42,7 @@ class LogCompression(
      * List를 받아서 가공 결과 List를 반환하는 형태로 먼저 구현한다.
      */
     private  val TAG = "logcmp"
+    private val calendar = java.util.Calendar.getInstance()
 
 
     suspend fun compressLogs(): List<VisitLog> {
@@ -60,7 +61,7 @@ class LogCompression(
         val result = logs.toMutableList()
 
         // 압축 대상 로그가 없으면 종료
-        if (result.size <= 1) {
+        if (result.size <= 4) {
             return result
         }
 
@@ -91,7 +92,15 @@ class LogCompression(
             // 마지막 로그는 다음 실행과 연결하기 위해 cmpconnect로 남긴다.
             // =====================================================
             if (i == result.lastIndex) {
-                setState(i, "cmpconnect")
+
+                // 마지막 로그가 압축의 꼬리라면
+                // 다음 가공과 연결하기 위해 connect로 남긴다.
+                if (current.logField2 == "cmplast") {
+                    setState(i, "cmpconnect")
+                }
+
+                // pending 등 압축 꼬리가 아닌 마지막 로그는
+                // 상태를 바꾸지 않고 그대로 둔다.
                 break
             }
 
@@ -189,12 +198,27 @@ class LogCompression(
                 // =================================================
                 // 현재 압축의 꼬리
                 // =================================================
-                "cmplast", "cmpconnect" -> {
+                "cmplast", -> {
 
                     val currentWifiMac = current.logWifiMac.take(17)
                     val nextWifiMac = next.logWifiMac.orEmpty().take(17)
 
                     if (currentWifiMac == nextWifiMac) {
+
+                        // 자정 경계를 넘으면 현재 로그에서 압축을 닫는다.
+                        // 다음 로그는 마킹하지 않고 그대로 둔다.
+                        // 현재 로그가 자정을 넘겼는지 확인
+                        val crossedMidnight = !isSameDate(
+                            current.logStartTime,
+                            current.logEndTime
+                        )
+                        if (crossedMidnight) {
+                            // 자정을 넘었으면 현재 로그에서 압축을 닫는다.
+                            // 다음 로그는 건드리지 않는다.
+                            setState(i, "cmplast")
+                            continue
+                        }
+
 
                         setState(i, "cmpignored")
                         setState(i + 1, "cmplast")
@@ -202,11 +226,30 @@ class LogCompression(
                         continue
                     }
 
-                    // 연결자가 이전 실행의 마지막 값이었다면
-                    // 이번 실행에서는 현재 압축의 마지막 값으로 확정한다.
-                    if (current.logField2 == "cmpconnect") {
-                        setState(i, "cmplast")
+
+
+                    continue
+                }
+
+                // 가공의 끝인 연결자를 만났을 때
+                // 즉, 이번 가공의 시작부분이 connect인 경우
+                "cmpconnect" -> {
+
+                    val currentWifiMac = current.logWifiMac.take(17)
+                    val nextWifiMac = next.logWifiMac.orEmpty().take(17)
+
+                    if (currentWifiMac == nextWifiMac) {
+
+                        // 이전 압축이 계속 이어짐
+                        setState(i, "cmpignored")
+                        setState(i + 1, "cmplast")
+
+                        continue
                     }
+
+                    // Wi-Fi가 다르면 이전 압축은 여기서 종료
+                    // next는 건드리지 않고 다음 반복에서 새 압축 후보로 판단
+                    setState(i, "cmplast")
 
                     continue
                 }
@@ -221,7 +264,7 @@ class LogCompression(
 // 이동경로도 날짜별로 따로 보기 때문에
 // 서로 다른 날짜의 로그가 하나의 압축으로 이어지면 안 된다.
 // =====================================================
-        val calendar = java.util.Calendar.getInstance()
+        /*val calendar = java.util.Calendar.getInstance()
 
         fun isSameDate(time1: Long, time2: Long): Boolean {
 
@@ -299,7 +342,7 @@ class LogCompression(
                     // 그대로 유지
                 }
             }
-        }
+        }*/
 
 
 // =====================================================
@@ -311,5 +354,21 @@ class LogCompression(
 
         return result
 
+    }
+
+    private fun isSameDate(
+        time1: Long,
+        time2: Long
+    ): Boolean {
+
+        calendar.timeInMillis = time1
+        val year1 = calendar.get(java.util.Calendar.YEAR)
+        val day1 = calendar.get(java.util.Calendar.DAY_OF_YEAR)
+
+        calendar.timeInMillis = time2
+        val year2 = calendar.get(java.util.Calendar.YEAR)
+        val day2 = calendar.get(java.util.Calendar.DAY_OF_YEAR)
+
+        return year1 == year2 && day1 == day2
     }
 }

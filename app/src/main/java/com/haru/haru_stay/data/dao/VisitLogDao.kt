@@ -156,13 +156,13 @@ interface LogDao {
     ): List<VisitLog>
 
     // 3차 압축 대상 로그 조회용 쿼리
-
-     @Query("""
-          SELECT *
-          FROM log_db
-          WHERE logField2 IN ('cmppending', 'cmpconnect')
-          ORDER BY logStartTime ASC
-     """)
-     suspend fun getLogsForCompression(): List<VisitLog>
-
+// 종료 시간이 없는 진행 중 로그는 압축 대상에서 제외한다.
+    @Query("""
+    SELECT *
+    FROM log_db
+    WHERE logField2 IN ('cmppending', 'cmpconnect')
+      AND logEndTime > 0
+    ORDER BY logStartTime ASC
+""")
+    suspend fun getLogsForCompression(): List<VisitLog>
 }
